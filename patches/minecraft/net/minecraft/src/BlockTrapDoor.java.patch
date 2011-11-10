@@ -8,7 +8,7 @@
 +        if(!disableValidation && !world.isBlockSolidOnSide(j1, j, k1, (i1&3)+2))
          {
              world.setBlockWithNotify(i, j, k, 0);
-             dropBlockAsItem(world, i, j, k, i1);
+             dropBlockAsItem(world, i, j, k, i1, 0);
 @@ -189,6 +189,7 @@
  
      public boolean canPlaceBlockOnSide(World world, int i, int j, int k, int l)

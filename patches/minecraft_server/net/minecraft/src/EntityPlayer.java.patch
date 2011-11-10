@@ -11,7 +11,7 @@
  // Referenced classes of package net.minecraft.src:
  //            EntityLiving, InventoryPlayer, FoodStats, PlayerCapabilities, 
  //            ContainerPlayer, World, ChunkCoordinates, DataWatcher, 
-@@ -433,6 +437,8 @@
+@@ -489,6 +493,8 @@
          worldObj.entityJoinedWorld(entityitem);
      }
  
@@ -20,8 +20,8 @@
      public float getCurrentPlayerStrVsBlock(Block block)
      {
          float f = inventory.getStrVsBlock(block);
-@@ -455,6 +461,32 @@
-         return f;
+@@ -517,6 +523,32 @@
+         return f1;
      }
  
 +    /* FORGE: Extended to allow metadata.
@@ -53,7 +53,7 @@
      public boolean canHarvestBlock(Block block)
      {
          return inventory.canHarvestBlock(block);
-@@ -615,6 +647,25 @@
+@@ -715,6 +747,25 @@
  
      protected void damageEntity(DamageSource damagesource, int i)
      {
@@ -79,7 +79,7 @@
          if(!damagesource.func_35083_b() && func_35180_G())
          {
              i = 1 + i >> 1;
-@@ -668,7 +719,9 @@
+@@ -766,7 +817,9 @@
  
      public void destroyCurrentEquippedItem()
      {
@@ -89,7 +89,7 @@
      }
  
      public double getYOffset()
-@@ -757,6 +810,10 @@
+@@ -892,6 +945,10 @@
  
      public EnumStatus sleepInBedAt(int i, int j, int k)
      {
