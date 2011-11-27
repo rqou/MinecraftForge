@@ -8,27 +8,21 @@
  
  import java.io.PrintStream;
  import java.util.*;
-@@ -325,10 +326,16 @@
+@@ -325,6 +326,13 @@
          }
          int i2 = xPosition * 16 + i;
          int j2 = zPosition * 16 + k;
++        
 +        if (Block.blocksList[l1] instanceof IOverrideReplace){
 +        	IOverrideReplace iovr = (IOverrideReplace)Block.blocksList[l1];
 +        	if (!iovr.canReplaceBlock(worldObj, i, j, k, l))
 +        		return iovr.getReplacedSuccess();
 +        }
-         blocks[i << worldObj.field_35250_b | k << worldObj.field_35252_a | j] = (byte)(byte0 & 0xff);
--        if(l1 != 0 && !worldObj.singleplayerWorld)
--        {
--            Block.blocksList[l1].onBlockRemoval(worldObj, i2, j, j2);
-+        if(l1 != 0) {
-+        	if (!worldObj.singleplayerWorld)
-+        		Block.blocksList[l1].onBlockRemoval(worldObj, i2, j, j2);
-+        	removeChunkBlockTileEntity(i, j, k);
-         }
-         data.setNibble(i, j, k, i1);
-         if(!worldObj.worldProvider.hasNoSky)
-@@ -360,7 +367,7 @@
++        
+         blocks[i << worldObj.field_35250_b | k << worldObj.worldYBits | j] = (byte)(byte0 & 0xff);
+         if(l1 != 0)
+         {
+@@ -367,7 +375,7 @@
                  TileEntity tileentity = getChunkBlockTileEntity(i, j, k);
                  if(tileentity == null)
                  {
@@ -37,7 +31,7 @@
                      worldObj.setBlockTileEntity(i, j, k, tileentity);
                  }
                  if(tileentity != null)
-@@ -368,14 +375,6 @@
+@@ -375,14 +383,6 @@
                      tileentity.func_35164_g();
                  }
              }
@@ -52,26 +46,28 @@
          }
          isModified = true;
          return true;
-@@ -397,10 +396,17 @@
+@@ -404,10 +404,19 @@
          }
          int l1 = xPosition * 16 + i;
          int i2 = zPosition * 16 + k;
-+        if (Block.blocksList[k1] instanceof IOverrideReplace){
-+        	IOverrideReplace iovr = (IOverrideReplace)Block.blocksList[k1];
++        
++        if (Block.blocksList[l1] instanceof IOverrideReplace){
++        	IOverrideReplace iovr = (IOverrideReplace)Block.blocksList[l1];
 +        	if (!iovr.canReplaceBlock(worldObj, i, j, k, l))
 +        		return iovr.getReplacedSuccess();
 +        }
-         blocks[i << worldObj.field_35250_b | k << worldObj.field_35252_a | j] = (byte)(byte0 & 0xff);
++        
+         blocks[i << worldObj.field_35250_b | k << worldObj.worldYBits | j] = (byte)(byte0 & 0xff);
          if(k1 != 0)
          {
 -            Block.blocksList[k1].onBlockRemoval(worldObj, l1, j, i2);
 +        	if (!worldObj.singleplayerWorld)
 +        		Block.blocksList[k1].onBlockRemoval(worldObj, l1, j, i2);
-+        	removeChunkBlockTileEntity(i, j, k);
++            worldObj.removeBlockTileEntity(l1, j, i2);
          }
          data.setNibble(i, j, k, 0);
          if(Block.lightOpacity[byte0 & 0xff] != 0)
-@@ -428,7 +434,7 @@
+@@ -435,7 +444,7 @@
                  TileEntity tileentity = getChunkBlockTileEntity(i, j, k);
                  if(tileentity == null)
                  {
@@ -80,7 +76,7 @@
                      worldObj.setBlockTileEntity(i, j, k, tileentity);
                  }
                  if(tileentity != null)
-@@ -436,14 +442,6 @@
+@@ -443,14 +452,6 @@
                      tileentity.func_35164_g();
                  }
              }
@@ -95,7 +91,7 @@
          }
          isModified = true;
          return true;
-@@ -579,6 +577,11 @@
+@@ -586,6 +587,11 @@
      {
          ChunkPosition chunkposition = new ChunkPosition(i, j, k);
          TileEntity tileentity = (TileEntity)chunkTileEntityMap.get(chunkposition);
@@ -107,7 +103,7 @@
          if(tileentity == null)
          {
              int l = getBlockID(i, j, k);
-@@ -588,18 +591,23 @@
+@@ -595,18 +601,23 @@
              }
              if(tileentity == null)
              {
@@ -138,7 +134,7 @@
          }
      }
  
-@@ -611,7 +619,7 @@
+@@ -618,7 +629,7 @@
          setChunkBlockTileEntity(i, j, k, tileentity);
          if(isChunkLoaded)
          {
@@ -147,7 +143,7 @@
          }
      }
  
-@@ -627,6 +635,8 @@
+@@ -634,6 +645,8 @@
              return;
          } else
          {

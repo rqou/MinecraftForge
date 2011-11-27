@@ -52,13 +52,12 @@
                      }
  
                  }
-@@ -194,10 +194,11 @@
+@@ -194,10 +194,10 @@
  
              if(flag2)
              {
--                field_40590_G += tessellator.draw();
-+            	ForgeHooksClient.afterRenderPass(i2);
-+                field_40590_G += Tessellator.instance.draw();
+-                bytesDrawn += tessellator.draw();
++                ForgeHooksClient.afterRenderPass(i2);
                  GL11.glPopMatrix();
                  GL11.glEndList();
 -                tessellator.setTranslationD(0.0D, 0.0D, 0.0D);
@@ -66,7 +65,7 @@
              } else
              {
                  flag1 = false;
-@@ -288,8 +289,4 @@
+@@ -288,8 +288,4 @@
          needsUpdate = true;
      }
  

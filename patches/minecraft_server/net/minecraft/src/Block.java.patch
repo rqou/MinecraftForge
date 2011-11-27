@@ -8,7 +8,7 @@
  
  import java.util.ArrayList;
  import java.util.Random;
-@@ -382,26 +383,41 @@
+@@ -384,26 +385,41 @@
          return 1;
      }
  
@@ -63,7 +63,7 @@
      public final void dropBlockAsItem(World world, int i, int j, int k, int l, int i1)
      {
          dropBlockAsItemWithChance(world, i, j, k, l, 1.0F, i1);
-@@ -413,18 +429,14 @@
+@@ -415,18 +431,14 @@
          {
              return;
          }
@@ -85,7 +85,7 @@
          }
  
      }
-@@ -709,6 +721,96 @@
+@@ -725,6 +737,96 @@
          return blockMaterial.getMaterialMobility();
      }
  

@@ -8,7 +8,7 @@
  
  import net.minecraft.client.Minecraft;
  
-@@ -39,12 +40,11 @@
+@@ -39,11 +40,10 @@
          }
          world.playAuxSFX(2001, i, j, k, block.blockID + world.getBlockMetadata(i, j, k) * 256);
          int i1 = world.getBlockMetadata(i, j, k);
@@ -17,15 +17,13 @@
 -        {
 -            block.onBlockDestroyedByPlayer(world, i, j, k, i1);
 -        }
--        return flag;
 +
-+	if(block==null) return false;
-+	boolean flag = block.removeBlockByPlayer(world,mc.thePlayer,i,j,k);
-+	if(flag) block.onBlockDestroyedByPlayer(world, i, j, k, i1);
-+	return flag;
++        boolean flag = block.removeBlockByPlayer(world, mc.thePlayer, i, j, k);
++        if(flag) 
++        	block.onBlockDestroyedByPlayer(world, i, j, k, i1);
+         return flag;
      }
  
-     public abstract void sendBlockRemoving(int i, int j, int k, int l);
 @@ -67,6 +67,7 @@
              if(itemstack1.stackSize == 0)
              {

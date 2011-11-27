@@ -8,7 +8,7 @@
  import java.util.ArrayList;
  import java.util.Random;
  
-@@ -310,12 +311,14 @@
+@@ -312,12 +313,14 @@
  
      public float getBlockBrightness(IBlockAccess iblockaccess, int i, int j, int k)
      {
@@ -25,7 +25,7 @@
      }
  
      public boolean shouldSideBeRendered(IBlockAccess iblockaccess, int i, int j, int k, int l)
-@@ -436,25 +439,41 @@
+@@ -438,25 +441,41 @@
      {
          return 1;
      }
@@ -79,7 +79,7 @@
      }
  
      public final void dropBlockAsItem(World world, int i, int j, int k, int l, int i1)
-@@ -468,18 +487,13 @@
+@@ -470,18 +489,13 @@
          {
              return;
          }
@@ -101,7 +101,7 @@
          }
  
      }
-@@ -789,6 +803,96 @@
+@@ -805,6 +819,96 @@
          return iblockaccess.isBlockNormalCube(i, j, k) ? 0.2F : 1.0F;
      }
  

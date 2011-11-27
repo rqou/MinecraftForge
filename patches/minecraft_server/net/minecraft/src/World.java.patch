@@ -1,7 +1,7 @@
 --- ../src_base/minecraft_server/net/minecraft/src/World.java	0000-00-00 00:00:00.000000000 -0000
 +++ ../src_work/minecraft_server/net/minecraft/src/World.java	0000-00-00 00:00:00.000000000 -0000
 @@ -51,7 +51,7 @@
-     public int field_27080_i;
+     public int lightningFlash;
      public boolean editingBlocks;
      private long lockTimestamp;
 -    protected int autosavePeriod;
@@ -22,7 +22,7 @@
      }
  
      public boolean blockExists(int i, int j, int k)
-@@ -1193,7 +1197,7 @@
+@@ -1207,7 +1211,7 @@
                      Chunk chunk = getChunkFromChunkCoords(tileentity.xCoord >> 4, tileentity.zCoord >> 4);
                      if(chunk != null)
                      {
@@ -31,7 +31,7 @@
                      }
                  }
              }
-@@ -1221,15 +1225,15 @@
+@@ -1235,15 +1239,15 @@
                      {
                          loadedTileEntityList.add(tileentity1);
                      }
@@ -49,7 +49,7 @@
                  }
              } while(true);
              addedTileEntityList.clear();
-@@ -1240,13 +1244,19 @@
+@@ -1254,13 +1258,19 @@
  
      public void addTileEntity(Collection collection)
      {
@@ -76,7 +76,7 @@
      }
  
      public void updateEntity(Entity entity)
-@@ -1446,6 +1456,9 @@
+@@ -1460,6 +1470,9 @@
                          if(j2 == Block.fire.blockID || j2 == Block.lavaMoving.blockID || j2 == Block.lavaStill.blockID)
                          {
                              return true;
@@ -86,7 +86,7 @@
                          }
                      }
  
-@@ -1686,46 +1699,22 @@
+@@ -1700,46 +1713,22 @@
  
      public void setBlockTileEntity(int i, int j, int k, TileEntity tileentity)
      {
@@ -145,7 +145,7 @@
      }
  
      public void func_35239_a(TileEntity tileentity)
-@@ -1748,13 +1737,18 @@
+@@ -1762,13 +1751,18 @@
      public boolean isBlockNormalCube(int i, int j, int k)
      {
          Block block = Block.blocksList[getBlockId(i, j, k)];
@@ -170,8 +170,8 @@
 +	return block.isBlockSolidOnSide(this,i,j,k,side);
      }
  
-     public void calculateInitialSkylight()
-@@ -2144,7 +2138,7 @@
+     public boolean func_41047_b(int i, int j, int k, boolean flag)
+@@ -2179,7 +2173,7 @@
  
      private int func_35241_e(int i, int j, int k, int l, int i1, int j1)
      {
@@ -180,7 +180,7 @@
          int l1 = getSavedLightValue(EnumSkyBlock.Block, j - 1, k, l) - j1;
          int i2 = getSavedLightValue(EnumSkyBlock.Block, j + 1, k, l) - j1;
          int j2 = getSavedLightValue(EnumSkyBlock.Block, j, k - 1, l) - j1;
-@@ -2488,6 +2482,7 @@
+@@ -2556,6 +2550,7 @@
          {
              block = null;
          }

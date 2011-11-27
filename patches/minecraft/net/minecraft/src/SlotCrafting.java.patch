@@ -9,7 +9,7 @@
  
  // Referenced classes of package net.minecraft.src:
 @@ -71,6 +72,7 @@
-             thePlayer.addStat(AchievementList.field_40460_F, 1);
+             thePlayer.addStat(AchievementList.bookcase, 1);
          }
          ModLoader.TakenFromCrafting(thePlayer, itemstack, craftMatrix);
 +        ForgeHooks.onTakenFromCrafting(thePlayer, itemstack, craftMatrix);

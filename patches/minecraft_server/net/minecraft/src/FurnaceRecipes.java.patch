@@ -24,7 +24,7 @@
          addSmelting(Block.oreIron.blockID, new ItemStack(Item.ingotIron));
          addSmelting(Block.oreGold.blockID, new ItemStack(Item.ingotGold));
          addSmelting(Block.oreDiamond.blockID, new ItemStack(Item.diamond));
-@@ -43,11 +46,32 @@
+@@ -46,11 +49,32 @@
          smeltingList.put(Integer.valueOf(i), itemstack);
      }
  

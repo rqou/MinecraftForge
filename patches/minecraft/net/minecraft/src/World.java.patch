@@ -21,7 +21,7 @@
      }
  
      public boolean blockExists(int i, int j, int k)
-@@ -1562,7 +1565,7 @@
+@@ -1576,7 +1579,7 @@
                      Chunk chunk = getChunkFromChunkCoords(tileentity.xCoord >> 4, tileentity.zCoord >> 4);
                      if(chunk != null)
                      {
@@ -30,7 +30,7 @@
                      }
                  }
              }
-@@ -1590,16 +1593,16 @@
+@@ -1604,16 +1607,16 @@
                      {
                          loadedTileEntityList.add(tileentity1);
                      }
@@ -50,7 +50,7 @@
              } while(true);
              addedTileEntityList.clear();
          }
-@@ -1609,13 +1612,17 @@
+@@ -1623,13 +1626,17 @@
  
      public void addTileEntity(Collection collection)
      {
@@ -75,7 +75,7 @@
      }
  
      public void updateEntity(Entity entity)
-@@ -1775,7 +1782,10 @@
+@@ -1789,7 +1796,10 @@
                          if(j2 == Block.fire.blockID || j2 == Block.lavaMoving.blockID || j2 == Block.lavaStill.blockID)
                          {
                              return true;
@@ -87,7 +87,7 @@
                      }
  
                  }
-@@ -2030,46 +2040,22 @@
+@@ -2044,46 +2054,22 @@
  
      public void setBlockTileEntity(int i, int j, int k, TileEntity tileentity)
      {
@@ -146,7 +146,7 @@
      }
  
      public void func_35455_a(TileEntity tileentity)
-@@ -2092,13 +2078,18 @@
+@@ -2106,13 +2092,18 @@
      public boolean isBlockNormalCube(int i, int j, int k)
      {
          Block block = Block.blocksList[getBlockId(i, j, k)];
@@ -171,8 +171,8 @@
 +        return block.isBlockSolidOnSide(this,i,j,k,side);
      }
  
-     public void saveWorldIndirectly(IProgressUpdate iprogressupdate)
-@@ -2496,7 +2487,7 @@
+     public boolean func_41082_b(int i, int j, int k, boolean flag)
+@@ -2531,7 +2522,7 @@
  
      private int computeBlockLightValue(int i, int j, int k, int l, int i1, int j1)
      {
@@ -181,7 +181,7 @@
          int l1 = getSavedLightValue(EnumSkyBlock.Block, j - 1, k, l) - j1;
          int i2 = getSavedLightValue(EnumSkyBlock.Block, j + 1, k, l) - j1;
          int j2 = getSavedLightValue(EnumSkyBlock.Block, j, k - 1, l) - j1;
-@@ -2872,6 +2863,7 @@
+@@ -2940,6 +2931,7 @@
          {
              block = null;
          }

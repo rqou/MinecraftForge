@@ -10,7 +10,7 @@
  // Referenced classes of package net.minecraft.src:
  //            Slot, EntityPlayer, ItemStack, Block, 
 @@ -71,6 +71,7 @@
-             thePlayer.addStat(AchievementList.field_40474_F, 1);
+             thePlayer.addStat(AchievementList.bookcase, 1);
          }
          ModLoader.TakenFromCrafting(thePlayer, itemstack);
 +  	ForgeHooks.onTakenFromCrafting(thePlayer, itemstack, craftMatrix);

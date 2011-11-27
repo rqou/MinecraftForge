@@ -13,7 +13,7 @@
  {
  
      private Block blocksEffectiveAgainst[];
--    private float efficiencyOnProperMaterial;
+-    protected float efficiencyOnProperMaterial;
 -    private int damageVsEntity;
 +    public float efficiencyOnProperMaterial;
 +    public int damageVsEntity;

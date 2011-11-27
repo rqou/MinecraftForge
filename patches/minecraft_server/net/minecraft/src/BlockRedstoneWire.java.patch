@@ -21,10 +21,10 @@
          {
              return false;
          }
-+	if(Block.blocksList[i1] instanceof IConnectRedstone) {
-+		IConnectRedstone icr=(IConnectRedstone)Block.blocksList[i1];
-+		return icr.canConnectRedstone(iblockaccess,i,j,k,l);
-+	}
-         if(Block.blocksList[i1].canProvidePower())
++        if(Block.blocksList[i1] instanceof IConnectRedstone) {
++        	IConnectRedstone icr=(IConnectRedstone)Block.blocksList[i1];
++        	return icr.canConnectRedstone(iblockaccess,i,j,k,l);
++        }
+         if(Block.blocksList[i1].canProvidePower() && l != -1)
          {
              return true;

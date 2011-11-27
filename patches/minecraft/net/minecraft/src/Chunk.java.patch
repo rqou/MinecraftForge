@@ -8,7 +8,7 @@
  
  import java.io.PrintStream;
  import java.util.*;
-@@ -348,10 +349,19 @@
+@@ -348,6 +349,13 @@
          }
          int i2 = xPosition * 16 + i;
          int j2 = zPosition * 16 + k;
@@ -20,17 +20,9 @@
 +        }
 +        
          blocks[i << worldObj.field_35471_b | k << worldObj.field_35473_a | j] = (byte)(byte0 & 0xff);
--        if(l1 != 0 && !worldObj.multiplayerWorld)
-+        if(l1 != 0)
+         if(l1 != 0)
          {
--            Block.blocksList[l1].onBlockRemoval(worldObj, i2, j, j2);
-+        	if (!worldObj.multiplayerWorld)
-+        		Block.blocksList[l1].onBlockRemoval(worldObj, i2, j, j2);
-+        	removeChunkBlockTileEntity(i, j, k);
-         }
-         data.setNibble(i, j, k, i1);
-         if(!worldObj.worldProvider.hasNoSky)
-@@ -383,7 +393,7 @@
+@@ -390,7 +398,7 @@
                  TileEntity tileentity = getChunkBlockTileEntity(i, j, k);
                  if(tileentity == null)
                  {
@@ -39,7 +31,7 @@
                      worldObj.setBlockTileEntity(i, j, k, tileentity);
                  }
                  if(tileentity != null)
-@@ -391,14 +401,6 @@
+@@ -398,14 +406,6 @@
                      tileentity.func_35144_b();
                  }
              }
@@ -54,7 +46,7 @@
          }
          isModified = true;
          return true;
-@@ -420,10 +422,17 @@
+@@ -427,10 +427,17 @@
          }
          int l1 = xPosition * 16 + i;
          int i2 = zPosition * 16 + k;
@@ -73,7 +65,7 @@
          }
          data.setNibble(i, j, k, 0);
          if(Block.lightOpacity[byte0 & 0xff] != 0)
-@@ -451,7 +460,7 @@
+@@ -458,7 +465,7 @@
                  TileEntity tileentity = getChunkBlockTileEntity(i, j, k);
                  if(tileentity == null)
                  {
@@ -82,7 +74,7 @@
                      worldObj.setBlockTileEntity(i, j, k, tileentity);
                  }
                  if(tileentity != null)
-@@ -459,14 +468,6 @@
+@@ -466,14 +473,6 @@
                      tileentity.func_35144_b();
                  }
              }
@@ -97,7 +89,7 @@
          }
          isModified = true;
          return true;
-@@ -602,6 +603,11 @@
+@@ -609,6 +608,11 @@
      {
          ChunkPosition chunkposition = new ChunkPosition(i, j, k);
          TileEntity tileentity = (TileEntity)chunkTileEntityMap.get(chunkposition);
@@ -109,7 +101,7 @@
          if(tileentity == null)
          {
              int l = getBlockID(i, j, k);
-@@ -611,18 +617,23 @@
+@@ -618,18 +622,23 @@
              }
              if(tileentity == null)
              {
@@ -140,7 +132,7 @@
          }
      }
  
-@@ -634,7 +645,7 @@
+@@ -641,7 +650,7 @@
          setChunkBlockTileEntity(i, j, k, tileentity);
          if(isChunkLoaded)
          {
@@ -149,7 +141,7 @@
          }
      }
  
-@@ -650,6 +661,8 @@
+@@ -657,6 +666,8 @@
              return;
          } else
          {
@@ -158,7 +150,7 @@
              tileentity.validate();
              chunkTileEntityMap.put(chunkposition, tileentity);
              return;
-@@ -803,6 +816,15 @@
+@@ -810,6 +821,15 @@
      public int setChunkData(byte abyte0[], int i, int j, int k, int l, int i1, int j1, 
              int k1)
      {
@@ -174,7 +166,7 @@
          for(int l1 = i; l1 < l; l1++)
          {
              for(int l2 = k; l2 < j1; l2++)
-@@ -852,12 +874,25 @@
+@@ -859,12 +879,25 @@
  
          }
  
