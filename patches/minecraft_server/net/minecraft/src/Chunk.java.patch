@@ -51,8 +51,8 @@
          int l1 = xPosition * 16 + i;
          int i2 = zPosition * 16 + k;
 +        
-+        if (Block.blocksList[l1] instanceof IOverrideReplace){
-+        	IOverrideReplace iovr = (IOverrideReplace)Block.blocksList[l1];
++        if (Block.blocksList[k1] instanceof IOverrideReplace){
++        	IOverrideReplace iovr = (IOverrideReplace)Block.blocksList[k1];
 +        	if (!iovr.canReplaceBlock(worldObj, i, j, k, l))
 +        		return iovr.getReplacedSuccess();
 +        }
