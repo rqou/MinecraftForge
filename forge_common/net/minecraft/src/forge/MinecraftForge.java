@@ -56,6 +56,15 @@ public class MinecraftForge {
     public static void registerCraftingHandler(ICraftingHandler handler) {
         ForgeHooks.craftingHandlers.add(handler);
     }
+    
+    /**
+     * Registers a new minecart handler
+     * @param handler The Handler to be registered
+     */
+    public static void registerMinecartHandler(IMinecartHandler handler)
+    {
+    	ForgeHooks.minecartHandlers.add(handler);
+    }
 
     /**
      * This is not supposed to be called outside of Minecraft internals.

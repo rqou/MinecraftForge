@@ -4,7 +4,7 @@ cd ..
 
 cmd /C reobfuscate.bat
 
-set PATH=E:\cygwin\bin;%PATH%
+set PATH=c:\cygwin\bin;%PATH%
 
 cd forge
 
