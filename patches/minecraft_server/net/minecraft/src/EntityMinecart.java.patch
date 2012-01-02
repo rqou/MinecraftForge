@@ -33,7 +33,7 @@
          {
              {
                  0, 0, -1
-@@ -87,13 +92,27 @@
+@@ -87,13 +92,36 @@
              }
          }
      };
@@ -56,36 +56,50 @@
 +    protected double velocityX;
 +    protected double velocityY;
 +    protected double velocityZ;  
-+    public static float maxSpeedRail = 0.4f;
-+    public static float maxSpeedGround = 0.4f;
-+    public static float maxSpeedAirLateral = 0.4f;
-+    public static float maxSpeedAirVertical = -1f;
-+    public static double dragAir = 0.94999998807907104D;
++    public static float defaultMaxSpeedRail = 0.4f;
++    public static float defaultMaxSpeedGround = 0.4f;
++    public static float defaultMaxSpeedAirLateral = 0.4f;
++    public static float defaultMaxSpeedAirVertical = -1f;
++    public static double defaultDragAir = 0.94999998807907104D;
 +    protected boolean canUseRail = true;  
 +    protected boolean canBePushed = true;
 +    private static IMinecartCollisionHandler collisionHandler = null;
 +    
++    /*
++     * Instance versions of the above physics properties
++     */
++    protected float maxSpeedRail;
++    protected float maxSpeedGround;
++    protected float maxSpeedAirLateral;
++    protected float maxSpeedAirVertical;
++    protected double dragAir;    
++        
      public EntityMinecart(World world)
      {
          super(world);
-@@ -104,6 +123,12 @@
+@@ -103,6 +131,18 @@
+         preventEntitySpawning = true;
          setSize(0.98F, 0.7F);
          yOffset = height / 2.0F;
-     }
-+    
-+    public EntityMinecart(World world, int type)
-+    {
-+    	super(world);
-+    	minecartType = type;
++        
++        maxSpeedRail = defaultMaxSpeedRail;
++        maxSpeedGround = defaultMaxSpeedGround;
++        maxSpeedAirLateral = defaultMaxSpeedAirLateral;
++        maxSpeedAirVertical = defaultMaxSpeedAirVertical;
++        dragAir = defaultDragAir;
 +    }
++    
++    public EntityMinecart(World world, int type) 
++    {
++    	this(world);
++    	minecartType = type;
+     }
  
      protected boolean canTriggerWalking()
-     {
-@@ -120,17 +145,29 @@
+@@ -120,17 +160,27 @@
  
      public AxisAlignedBB getCollisionBox(Entity entity)
      {
-+    	
 +    	if (getCollisionHandler() != null)
 +    	{
 +    		return getCollisionHandler().getCollisionBox(this, entity);
@@ -96,7 +110,6 @@
  
      public AxisAlignedBB getBoundingBox()
      {
-+    	
 +    	if (getCollisionHandler() != null)
 +    	{
 +    		return getCollisionHandler().getBoundingBox(this);
@@ -112,7 +125,7 @@
      }
  
      public EntityMinecart(World world, double d, double d1, double d2, 
-@@ -169,8 +206,10 @@
+@@ -169,8 +219,10 @@
                  riddenByEntity.mountEntity(this);
              }
              setEntityDead();
@@ -125,7 +138,7 @@
              {
                  EntityMinecart entityminecart = this;
  label0:
-@@ -204,12 +243,6 @@
+@@ -204,12 +256,6 @@
                          worldObj.entityJoinedWorld(entityitem);
                      } while(true);
                  }
@@ -138,7 +151,7 @@
              }
          }
          return true;
-@@ -267,7 +300,7 @@
+@@ -267,7 +313,7 @@
          {
              func_41018_e_(func_41020_o() - 1);
          }
@@ -147,7 +160,7 @@
          {
              worldObj.spawnParticle("largesmoke", posX, posY + 0.80000000000000004D, posZ, 0.0D, 0.0D, 0.0D);
          }
-@@ -307,22 +340,19 @@
+@@ -307,22 +353,19 @@
          double d2 = 0.40000000000000002D;
          double d4 = 0.0078125D;
          int l = worldObj.getBlockId(i, j, k);
@@ -174,7 +187,7 @@
              if(i1 >= 2 && i1 <= 5)
              {
                  posY = j + 1;
-@@ -356,7 +386,8 @@
+@@ -356,7 +399,8 @@
              double d13 = Math.sqrt(motionX * motionX + motionZ * motionZ);
              motionX = (d13 * d9) / d11;
              motionZ = (d13 * d10) / d11;
@@ -184,7 +197,7 @@
              {
                  double d16 = Math.sqrt(motionX * motionX + motionZ * motionZ);
                  if(d16 < 0.029999999999999999D)
-@@ -397,30 +428,9 @@
+@@ -397,30 +441,9 @@
              posX = d18 + d9 * d17;
              posZ = d19 + d10 * d17;
              setPosition(posX, posY + (double)yOffset, posZ);
@@ -218,7 +231,7 @@
              if(ai[0][1] != 0 && MathHelper.floor_double(posX) - i == ai[0][0] && MathHelper.floor_double(posZ) - k == ai[0][2])
              {
                  setPosition(posX, posY + (double)ai[0][1], posZ);
-@@ -429,37 +439,9 @@
+@@ -429,37 +452,9 @@
              {
                  setPosition(posX, posY + (double)ai[1][1], posZ);
              }
@@ -259,7 +272,7 @@
              Vec3D vec3d1 = func_182_g(posX, posY, posZ);
              if(vec3d1 != null && vec3d != null)
              {
-@@ -480,25 +462,15 @@
+@@ -480,25 +475,15 @@
                  motionX = d15 * (double)(k1 - i);
                  motionZ = d15 * (double)(l1 - k);
              }
@@ -292,7 +305,7 @@
              {
                  double d31 = Math.sqrt(motionX * motionX + motionZ * motionZ);
                  if(d31 > 0.01D)
-@@ -530,37 +502,10 @@
+@@ -530,37 +515,10 @@
                      }
                  }
              }
@@ -333,7 +346,7 @@
          }
          rotationPitch = 0.0F;
          double d6 = prevPosX - posX;
-@@ -582,7 +527,20 @@
+@@ -582,7 +540,20 @@
              field_469_aj = !field_469_aj;
          }
          setRotation(rotationYaw, rotationPitch);
@@ -355,7 +368,7 @@
          if(list != null && list.size() > 0)
          {
              for(int j1 = 0; j1 < list.size(); j1++)
-@@ -603,6 +561,178 @@
+@@ -603,6 +574,178 @@
              }
              riddenByEntity = null;
          }
@@ -446,7 +459,7 @@
 +        }
 +        float railMaxSpeed = ((BlockRail)Block.blocksList[id]).getRailMaxSpeed(worldObj, this, i, j, k);
 +        
-+        double maxSpeed = Math.min(railMaxSpeed, getCartMaxSpeed());
++        double maxSpeed = Math.min(railMaxSpeed, getMaxSpeedRail());
 +        double d23 = motionX;
 +        double d25 = motionZ;
 +        if(riddenByEntity != null)
@@ -479,10 +492,10 @@
 +     */
 +    protected void moveMinecartOffRail(int i, int j, int k)
 +    {
-+        double d2 = maxSpeedGround;
++        double d2 = getMaxSpeedGround();
 +        if(!onGround)
 +        {
-+            d2 = maxSpeedAirLateral;
++            d2 = getMaxSpeedAirLateral();
 +        }
 +        if(motionX < -d2)
 +        {
@@ -501,9 +514,9 @@
 +            motionZ = d2;
 +        }
 +        double moveY = motionY;
-+        if(maxSpeedAirVertical > 0 && motionY > maxSpeedAirVertical)
++        if(getMaxSpeedAirVertical() > 0 && motionY > getMaxSpeedAirVertical())
 +        {
-+            moveY = maxSpeedAirVertical;
++            moveY = getMaxSpeedAirVertical();
 +            if(Math.abs(motionX) < 0.3f && Math.abs(motionZ) < 0.3f)
 +            {
 +                moveY = 0.15f;
@@ -519,9 +532,9 @@
 +        moveEntity(motionX, moveY, motionZ);
 +        if(!onGround)
 +        {
-+            motionX *= dragAir;
-+            motionY *= dragAir;
-+            motionZ *= dragAir;
++            motionX *= getDragAir();
++            motionY *= getDragAir();
++            motionZ *= getDragAir();
 +        }
 +    }
 +    
@@ -534,7 +547,7 @@
          if(fuel > 0)
          {
              fuel--;
-@@ -626,12 +756,8 @@
+@@ -626,12 +769,8 @@
          int l = worldObj.getBlockId(i, j, k);
          if(BlockRail.isRailBlock(l))
          {
@@ -548,7 +561,7 @@
              if(i1 >= 2 && i1 <= 5)
              {
                  d1 = j + 1;
-@@ -684,13 +810,14 @@
+@@ -684,13 +823,14 @@
      protected void writeEntityToNBT(NBTTagCompound nbttagcompound)
      {
          nbttagcompound.setInteger("Type", minecartType);
@@ -567,7 +580,15 @@
          {
              NBTTagList nbttaglist = new NBTTagList();
              for(int i = 0; i < cargoItems.length; i++)
-@@ -711,13 +838,13 @@
+@@ -703,7 +843,6 @@
+                     nbttaglist.setTag(nbttagcompound1);
+                 }
+             }
+-
+             nbttagcompound.setTag("Items", nbttaglist);
+         }
+     }
+@@ -711,13 +850,14 @@
      protected void readEntityFromNBT(NBTTagCompound nbttagcompound)
      {
          minecartType = nbttagcompound.getInteger("Type");
@@ -577,31 +598,37 @@
              pushX = nbttagcompound.getDouble("PushX");
              pushZ = nbttagcompound.getDouble("PushZ");
 -            fuel = nbttagcompound.getShort("Fuel");
-+            fuel = nbttagcompound.getInteger("Fuel");
-         } else
+-        } else
 -        if(minecartType == 1)
++            fuel = nbttagcompound.getInteger("Fuel");
++        }
++        
 +        if(getSizeInventory() > 0)
          {
              NBTTagList nbttaglist = nbttagcompound.getTagList("Items");
              cargoItems = new ItemStack[getSizeInventory()];
-@@ -736,6 +863,16 @@
+@@ -730,12 +870,19 @@
+                     cargoItems[j] = ItemStack.loadItemStackFromNBT(nbttagcompound1);
+                 }
+             }
+-
+         }
+     }
  
      public void applyEntityCollision(Entity entity)
      {
 +    	ForgeHooks.onMinecartEntityCollision(this, entity);
 +    	
-+    	
 +    	if (getCollisionHandler() != null)
 +    	{
 +    		getCollisionHandler().onEntityCollision(this, entity);
 +    		return;
-+    	}
-+    	
++    	}    	
 +    	
          if(worldObj.singleplayerWorld)
          {
              return;
-@@ -744,7 +881,7 @@
+@@ -744,7 +891,7 @@
          {
              return;
          }
@@ -610,7 +637,7 @@
          {
              entity.mountEntity(this);
          }
-@@ -782,7 +919,7 @@
+@@ -782,7 +929,7 @@
                  }
                  double d7 = entity.motionX + motionX;
                  double d8 = entity.motionZ + motionZ;
@@ -619,7 +646,7 @@
                  {
                      motionX *= 0.20000000298023224D;
                      motionZ *= 0.20000000298023224D;
-@@ -790,7 +927,7 @@
+@@ -790,7 +937,7 @@
                      entity.motionX *= 0.94999998807907104D;
                      entity.motionZ *= 0.94999998807907104D;
                  } else
@@ -628,7 +655,7 @@
                  {
                      entity.motionX *= 0.20000000298023224D;
                      entity.motionZ *= 0.20000000298023224D;
-@@ -818,7 +955,7 @@
+@@ -818,7 +965,7 @@
  
      public int getSizeInventory()
      {
@@ -637,7 +664,7 @@
      }
  
      public ItemStack getStackInSlot(int i)
-@@ -873,7 +1010,12 @@
+@@ -873,7 +1020,12 @@
  
      public boolean interact(EntityPlayer entityplayer)
      {
@@ -651,7 +678,7 @@
          {
              if(riddenByEntity != null && (riddenByEntity instanceof EntityPlayer) && riddenByEntity != entityplayer)
              {
-@@ -884,14 +1026,14 @@
+@@ -884,14 +1036,14 @@
                  entityplayer.mountEntity(this);
              }
          } else
@@ -668,7 +695,7 @@
          {
              ItemStack itemstack = entityplayer.inventory.getCurrentItem();
              if(itemstack != null && itemstack.itemID == Item.coal.shiftedIndex)
-@@ -917,7 +1059,7 @@
+@@ -917,7 +1069,7 @@
          return entityplayer.getDistanceSqToEntity(this) <= 64D;
      }
  
@@ -677,11 +704,10 @@
      {
          return (dataWatcher.getWatchableObjectByte(16) & 1) != 0;
      }
-@@ -970,5 +1112,154 @@
+@@ -970,5 +1122,203 @@
      {
          return dataWatcher.getWatchableObjectInt(18);
      }
--
 +    
 +    /**
 +     * Drops the cart as a item. The exact item dropped is defined by getItemDropped().
@@ -727,19 +753,6 @@
 +    public ItemStack getCartItem()
 +    {
 +        return MinecraftForge.getItemForCart(this);
-+    }
-+    
-+    /**
-+     * Returns the carts max speed.
-+     * Carts going faster than 1.1 cause issues with chunk loading.
-+     * Carts cant traverse slopes or corners at greater than 0.5 - 0.6.
-+     * This value is compared with the rails max speed to determine
-+     * the carts current max speed. A normal rails max speed is 0.4.
-+     * @return Carts max speed.
-+     */
-+    public float getCartMaxSpeed()
-+    {
-+        return 0.4f;
 +    }
 +
 +    /**
@@ -831,5 +844,67 @@
 +    public static void setCollisionHandler(IMinecartCollisionHandler handler)
 +    {
 +    	collisionHandler = handler;
++    }
++        
++    /**
++     * Getters/setters for physics variables
++     */
++    
++    /**
++     * Returns the carts max speed.
++     * Carts going faster than 1.1 cause issues with chunk loading.
++     * Carts cant traverse slopes or corners at greater than 0.5 - 0.6.
++     * This value is compared with the rails max speed to determine
++     * the carts current max speed. A normal rails max speed is 0.4.
++     * @return Carts max speed.
++     */
++    public float getMaxSpeedRail()
++    {
++        return maxSpeedRail;
++    }
+ 
++    public void setMaxSpeedRail(float value)
++    {
++    	maxSpeedRail = value;
++    }
++    
++    public float getMaxSpeedGround()
++    {
++    	return maxSpeedGround;
++    }
++    
++    public void setMaxSpeedGround(float value)
++    {
++    	maxSpeedGround = value;
++    }
++    
++    public float getMaxSpeedAirLateral()
++    {
++    	return maxSpeedAirLateral;
++    }
++    
++    public void setMaxSpeedAirLateral(float value)
++    {
++    	maxSpeedAirLateral = value;
++    }
++    
++    public float getMaxSpeedAirVertical()
++    {
++    	return maxSpeedAirVertical;
++    }
++    
++    public void setMaxSpeedAirVertical(float value)
++    {
++    	maxSpeedAirVertical = value;
++    }
++    
++    public double getDragAir()
++    {
++    	return dragAir;
++    }
++    
++    public void setDragAir(double value)
++    {
++    	dragAir = value;
 +    }
  }
