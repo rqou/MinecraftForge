@@ -1,6 +1,6 @@
 --- ../src_base/minecraft/net/minecraft/src/EntityMinecart.java	0000-00-00 00:00:00.000000000 -0000
 +++ ../src_work/minecraft/net/minecraft/src/EntityMinecart.java	0000-00-00 00:00:00.000000000 -0000
-@@ -4,9 +4,13 @@
+@@ -4,9 +4,14 @@
  
  package net.minecraft.src;
  
@@ -10,11 +10,12 @@
  
 +import net.minecraft.src.forge.ForgeHooks;
 +import net.minecraft.src.forge.IMinecartCollisionHandler;
++import net.minecraft.src.forge.MinecraftForge;
 +
  // Referenced classes of package net.minecraft.src:
  //            Entity, IInventory, ItemStack, DataWatcher, 
  //            World, Item, EntityItem, Block, 
-@@ -18,13 +22,13 @@
+@@ -18,13 +23,13 @@
      implements IInventory
  {
  
@@ -32,7 +33,7 @@
          {
              {
                  0, 0, -1
-@@ -87,16 +91,27 @@
+@@ -87,16 +92,27 @@
              }
          }
      };
@@ -70,7 +71,7 @@
      public EntityMinecart(World world)
      {
          super(world);
-@@ -107,6 +122,12 @@
+@@ -107,6 +123,12 @@
          setSize(0.98F, 0.7F);
          yOffset = height / 2.0F;
      }
@@ -83,7 +84,7 @@
  
      protected boolean canTriggerWalking()
      {
-@@ -123,17 +144,29 @@
+@@ -123,17 +145,29 @@
  
      public AxisAlignedBB getCollisionBox(Entity entity)
      {
@@ -114,7 +115,7 @@
      }
  
      public EntityMinecart(World world, double d, double d1, double d2, 
-@@ -172,8 +205,10 @@
+@@ -172,8 +206,10 @@
                  riddenByEntity.mountEntity(this);
              }
              setEntityDead();
@@ -127,7 +128,7 @@
              {
                  EntityMinecart entityminecart = this;
  label0:
-@@ -207,12 +242,6 @@
+@@ -207,12 +243,6 @@
                          worldObj.spawnEntityInWorld(entityitem);
                      } while(true);
                  }
@@ -140,7 +141,7 @@
              }
          }
          return true;
-@@ -277,7 +306,7 @@
+@@ -277,7 +307,7 @@
          {
              func_41024_b(func_41025_i() - 1);
          }
@@ -149,7 +150,7 @@
          {
              worldObj.spawnParticle("largesmoke", posX, posY + 0.80000000000000004D, posZ, 0.0D, 0.0D, 0.0D);
          }
-@@ -317,22 +346,19 @@
+@@ -317,22 +347,19 @@
          double d2 = 0.40000000000000002D;
          double d4 = 0.0078125D;
          int l = worldObj.getBlockId(i, j, k);
@@ -176,7 +177,7 @@
              if(i1 >= 2 && i1 <= 5)
              {
                  posY = j + 1;
-@@ -366,7 +392,8 @@
+@@ -366,7 +393,8 @@
              double d13 = Math.sqrt(motionX * motionX + motionZ * motionZ);
              motionX = (d13 * d9) / d11;
              motionZ = (d13 * d10) / d11;
@@ -186,7 +187,7 @@
              {
                  double d16 = Math.sqrt(motionX * motionX + motionZ * motionZ);
                  if(d16 < 0.029999999999999999D)
-@@ -407,30 +434,9 @@
+@@ -407,30 +435,9 @@
              posX = d18 + d9 * d17;
              posZ = d19 + d10 * d17;
              setPosition(posX, posY + (double)yOffset, posZ);
@@ -220,7 +221,7 @@
              if(ai[0][1] != 0 && MathHelper.floor_double(posX) - i == ai[0][0] && MathHelper.floor_double(posZ) - k == ai[0][2])
              {
                  setPosition(posX, posY + (double)ai[0][1], posZ);
-@@ -439,37 +445,9 @@
+@@ -439,37 +446,9 @@
              {
                  setPosition(posX, posY + (double)ai[1][1], posZ);
              }
@@ -261,7 +262,7 @@
              Vec3D vec3d1 = func_514_g(posX, posY, posZ);
              if(vec3d1 != null && vec3d != null)
              {
-@@ -490,25 +468,15 @@
+@@ -490,25 +469,15 @@
                  motionX = d15 * (double)(k1 - i);
                  motionZ = d15 * (double)(l1 - k);
              }
@@ -294,7 +295,7 @@
              {
                  double d31 = Math.sqrt(motionX * motionX + motionZ * motionZ);
                  if(d31 > 0.01D)
-@@ -540,37 +508,10 @@
+@@ -540,37 +509,10 @@
                      }
                  }
              }
@@ -335,7 +336,7 @@
          }
          rotationPitch = 0.0F;
          double d6 = prevPosX - posX;
-@@ -592,7 +533,20 @@
+@@ -592,7 +534,20 @@
              field_856_i = !field_856_i;
          }
          setRotation(rotationYaw, rotationPitch);
@@ -357,7 +358,7 @@
          if(list != null && list.size() > 0)
          {
              for(int j1 = 0; j1 < list.size(); j1++)
-@@ -613,6 +567,178 @@
+@@ -613,6 +568,178 @@
              }
              riddenByEntity = null;
          }
@@ -536,7 +537,7 @@
          if(fuel > 0)
          {
              fuel--;
-@@ -636,11 +762,8 @@
+@@ -636,11 +763,8 @@
          int l = worldObj.getBlockId(i, j, k);
          if(BlockRail.isRailBlock(l))
          {
@@ -550,7 +551,7 @@
              d1 = j;
              if(i1 >= 2 && i1 <= 5)
              {
-@@ -681,12 +804,8 @@
+@@ -681,12 +805,8 @@
          int l = worldObj.getBlockId(i, j, k);
          if(BlockRail.isRailBlock(l))
          {
@@ -564,7 +565,7 @@
              if(i1 >= 2 && i1 <= 5)
              {
                  d1 = j + 1;
-@@ -739,13 +858,14 @@
+@@ -739,13 +859,14 @@
      protected void writeEntityToNBT(NBTTagCompound nbttagcompound)
      {
          nbttagcompound.setInteger("Type", minecartType);
@@ -583,7 +584,7 @@
          {
              NBTTagList nbttaglist = new NBTTagList();
              for(int i = 0; i < cargoItems.length; i++)
-@@ -766,13 +886,14 @@
+@@ -766,13 +887,14 @@
      protected void readEntityFromNBT(NBTTagCompound nbttagcompound)
      {
          minecartType = nbttagcompound.getInteger("Type");
@@ -602,7 +603,7 @@
          {
              NBTTagList nbttaglist = nbttagcompound.getTagList("Items");
              cargoItems = new ItemStack[getSizeInventory()];
-@@ -796,6 +917,16 @@
+@@ -796,6 +918,16 @@
  
      public void applyEntityCollision(Entity entity)
      {
@@ -619,7 +620,7 @@
          if(worldObj.multiplayerWorld)
          {
              return;
-@@ -804,7 +935,7 @@
+@@ -804,7 +936,7 @@
          {
              return;
          }
@@ -628,7 +629,7 @@
          {
              entity.mountEntity(this);
          }
-@@ -842,7 +973,7 @@
+@@ -842,7 +974,7 @@
                  }
                  double d7 = entity.motionX + motionX;
                  double d8 = entity.motionZ + motionZ;
@@ -637,7 +638,7 @@
                  {
                      motionX *= 0.20000000298023224D;
                      motionZ *= 0.20000000298023224D;
-@@ -850,7 +981,7 @@
+@@ -850,7 +982,7 @@
                      entity.motionX *= 0.94999998807907104D;
                      entity.motionZ *= 0.94999998807907104D;
                  } else
@@ -646,7 +647,7 @@
                  {
                      entity.motionX *= 0.20000000298023224D;
                      entity.motionZ *= 0.20000000298023224D;
-@@ -878,7 +1009,7 @@
+@@ -878,7 +1010,7 @@
  
      public int getSizeInventory()
      {
@@ -655,7 +656,7 @@
      }
  
      public ItemStack getStackInSlot(int i)
-@@ -933,7 +1064,12 @@
+@@ -933,7 +1065,12 @@
  
      public boolean interact(EntityPlayer entityplayer)
      {
@@ -669,7 +670,7 @@
          {
              if(riddenByEntity != null && (riddenByEntity instanceof EntityPlayer) && riddenByEntity != entityplayer)
              {
-@@ -944,14 +1080,14 @@
+@@ -944,14 +1081,14 @@
                  entityplayer.mountEntity(this);
              }
          } else
@@ -686,7 +687,7 @@
          {
              ItemStack itemstack = entityplayer.inventory.getCurrentItem();
              if(itemstack != null && itemstack.itemID == Item.coal.shiftedIndex)
-@@ -998,7 +1134,7 @@
+@@ -998,7 +1135,7 @@
          return entityplayer.getDistanceSqToEntity(this) <= 64D;
      }
  
@@ -695,7 +696,7 @@
      {
          return (dataWatcher.getWatchableObjectByte(16) & 1) != 0;
      }
-@@ -1051,5 +1187,154 @@
+@@ -1051,5 +1188,154 @@
      {
          return dataWatcher.getWatchableObjectInt(18);
      }
@@ -744,7 +745,7 @@
 +     */
 +    public ItemStack getCartItem()
 +    {
-+        return null; //return MCLHooks.getItemForCart(this);
++        return MinecraftForge.getItemForCart(this);
 +    }
 +    
 +    /**
