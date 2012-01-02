@@ -1,6 +1,6 @@
 --- ../src_base/minecraft_server/net/minecraft/src/EntityMinecart.java	0000-00-00 00:00:00.000000000 -0000
 +++ ../src_work/minecraft_server/net/minecraft/src/EntityMinecart.java	0000-00-00 00:00:00.000000000 -0000
-@@ -4,9 +4,12 @@
+@@ -4,9 +4,13 @@
  
  package net.minecraft.src;
  
@@ -9,11 +9,12 @@
  import java.util.Random;
  
 +import net.minecraft.src.forge.ForgeHooks;
++import net.minecraft.src.forge.IMinecartCollisionHandler;
 +
  // Referenced classes of package net.minecraft.src:
  //            Entity, IInventory, ItemStack, DataWatcher, 
  //            World, Item, EntityItem, Block, 
-@@ -18,13 +21,13 @@
+@@ -18,13 +22,13 @@
      implements IInventory
  {
  
@@ -31,7 +32,7 @@
          {
              {
                  0, 0, -1
-@@ -87,13 +90,21 @@
+@@ -87,13 +91,27 @@
              }
          }
      };
@@ -50,17 +51,23 @@
 +    protected double minecartPitch;
 +
 +    /*Forge: Minecart Compatibility Layer Integration.
-+     * Initial ports are commented out until they are further considered.
-+     * 01/01/2012 - Lex
 +     */
 +    protected double velocityX;
 +    protected double velocityY;
-+    protected double velocityZ;    
++    protected double velocityZ;  
++    public static float maxSpeedRail = 0.4f;
++    public static float maxSpeedGround = 0.4f;
++    public static float maxSpeedAirLateral = 0.4f;
++    public static float maxSpeedAirVertical = -1f;
++    public static double dragAir = 0.94999998807907104D;
++    protected boolean canUseRail = true;  
++    protected boolean canBePushed = true;
++    private static IMinecartCollisionHandler collisionHandler = null;
 +    
      public EntityMinecart(World world)
      {
          super(world);
-@@ -104,6 +115,12 @@
+@@ -104,6 +122,12 @@
          setSize(0.98F, 0.7F);
          yOffset = height / 2.0F;
      }
@@ -73,37 +80,38 @@
  
      protected boolean canTriggerWalking()
      {
-@@ -120,16 +137,29 @@
+@@ -120,17 +144,29 @@
  
      public AxisAlignedBB getCollisionBox(Entity entity)
      {
-+    	/*
++    	
 +    	if (getCollisionHandler() != null)
 +    	{
 +    		return getCollisionHandler().getCollisionBox(this, entity);
 +    	}
-+    	*/
++    	
          return entity.boundingBox;
      }
  
      public AxisAlignedBB getBoundingBox()
      {
-+    	/*
++    	
 +    	if (getCollisionHandler() != null)
 +    	{
 +    		return getCollisionHandler().getBoundingBox(this);
 +    	}
-+    	*/	
++    	
          return null;
      }
  
      public boolean canBePushed()
      {
-+    	//return canBePushed;
-         return true;
+-        return true;
++    	return canBePushed;
      }
  
-@@ -169,8 +199,10 @@
+     public EntityMinecart(World world, double d, double d1, double d2, 
+@@ -169,8 +205,10 @@
                  riddenByEntity.mountEntity(this);
              }
              setEntityDead();
@@ -116,7 +124,7 @@
              {
                  EntityMinecart entityminecart = this;
  label0:
-@@ -204,12 +236,6 @@
+@@ -204,12 +242,6 @@
                          worldObj.entityJoinedWorld(entityitem);
                      } while(true);
                  }
@@ -129,7 +137,7 @@
              }
          }
          return true;
-@@ -267,7 +293,7 @@
+@@ -267,7 +299,7 @@
          {
              func_41018_e_(func_41020_o() - 1);
          }
@@ -138,7 +146,7 @@
          {
              worldObj.spawnParticle("largesmoke", posX, posY + 0.80000000000000004D, posZ, 0.0D, 0.0D, 0.0D);
          }
-@@ -307,22 +333,19 @@
+@@ -307,22 +339,19 @@
          double d2 = 0.40000000000000002D;
          double d4 = 0.0078125D;
          int l = worldObj.getBlockId(i, j, k);
@@ -165,7 +173,7 @@
              if(i1 >= 2 && i1 <= 5)
              {
                  posY = j + 1;
-@@ -356,7 +379,8 @@
+@@ -356,7 +385,8 @@
              double d13 = Math.sqrt(motionX * motionX + motionZ * motionZ);
              motionX = (d13 * d9) / d11;
              motionZ = (d13 * d10) / d11;
@@ -175,7 +183,7 @@
              {
                  double d16 = Math.sqrt(motionX * motionX + motionZ * motionZ);
                  if(d16 < 0.029999999999999999D)
-@@ -397,30 +421,9 @@
+@@ -397,30 +427,9 @@
              posX = d18 + d9 * d17;
              posZ = d19 + d10 * d17;
              setPosition(posX, posY + (double)yOffset, posZ);
@@ -209,7 +217,7 @@
              if(ai[0][1] != 0 && MathHelper.floor_double(posX) - i == ai[0][0] && MathHelper.floor_double(posZ) - k == ai[0][2])
              {
                  setPosition(posX, posY + (double)ai[0][1], posZ);
-@@ -429,37 +432,9 @@
+@@ -429,37 +438,9 @@
              {
                  setPosition(posX, posY + (double)ai[1][1], posZ);
              }
@@ -250,7 +258,7 @@
              Vec3D vec3d1 = func_182_g(posX, posY, posZ);
              if(vec3d1 != null && vec3d != null)
              {
-@@ -480,25 +455,15 @@
+@@ -480,25 +461,15 @@
                  motionX = d15 * (double)(k1 - i);
                  motionZ = d15 * (double)(l1 - k);
              }
@@ -283,7 +291,7 @@
              {
                  double d31 = Math.sqrt(motionX * motionX + motionZ * motionZ);
                  if(d31 > 0.01D)
-@@ -530,37 +495,10 @@
+@@ -530,37 +501,10 @@
                      }
                  }
              }
@@ -324,29 +332,29 @@
          }
          rotationPitch = 0.0F;
          double d6 = prevPosX - posX;
-@@ -582,7 +520,20 @@
+@@ -582,7 +526,20 @@
              field_469_aj = !field_469_aj;
          }
          setRotation(rotationYaw, rotationPitch);
 -        List list = worldObj.getEntitiesWithinAABBExcludingEntity(this, boundingBox.expand(0.20000000298023224D, 0.0D, 0.20000000298023224D));
 +
 +        AxisAlignedBB box = null;
-+        /*
++        
 +        if (getCollisionHandler() != null)
 +        {
 +        	box = getCollisionHandler().getMinecartCollisionBox(this);
 +        }
 +        else
 +        {
-+        */
++        
 +        	box = boundingBox.expand(0.20000000298023224D, 0.0D, 0.20000000298023224D);
-+        //}
++        }
 +        
 +        List list = worldObj.getEntitiesWithinAABBExcludingEntity(this, box);
          if(list != null && list.size() > 0)
          {
              for(int j1 = 0; j1 < list.size(); j1++)
-@@ -603,6 +554,204 @@
+@@ -603,6 +560,178 @@
              }
              riddenByEntity = null;
          }
@@ -463,32 +471,6 @@
 +        }
 +        moveEntity(d23, 0.0D, d25);
 +    }
-+
-+    
-+    protected float getMaxSpeedGround()
-+    {
-+    	return 0.4F;
-+    }
-+    
-+    protected float getMaxSpeedAirLateral()
-+    {
-+    	return 0.4F;
-+    }
-+    
-+    protected float getMaxSpeedAirVertical()
-+    {
-+    	return -1f;
-+    }
-+    
-+    protected float getMaxSpeedRail()
-+    {
-+    	return 0.4F;
-+    }
-+    
-+    protected double getAirDrag()
-+    {
-+    	return 0.94999998807907104D;
-+    }
 +    
 +    /**
 +     * Moved to allow overrides.
@@ -496,10 +478,10 @@
 +     */
 +    protected void moveMinecartOffRail(int i, int j, int k)
 +    {
-+        double d2 = getMaxSpeedGround();
++        double d2 = maxSpeedGround;
 +        if(!onGround)
 +        {
-+            d2 = getMaxSpeedAirLateral();
++            d2 = maxSpeedAirLateral;
 +        }
 +        if(motionX < -d2)
 +        {
@@ -518,9 +500,9 @@
 +            motionZ = d2;
 +        }
 +        double moveY = motionY;
-+        if(getMaxSpeedAirVertical() > 0 && motionY > getMaxSpeedAirVertical())
++        if(maxSpeedAirVertical > 0 && motionY > maxSpeedAirVertical)
 +        {
-+            moveY = getMaxSpeedAirVertical();
++            moveY = maxSpeedAirVertical;
 +            if(Math.abs(motionX) < 0.3f && Math.abs(motionZ) < 0.3f)
 +            {
 +                moveY = 0.15f;
@@ -536,9 +518,9 @@
 +        moveEntity(motionX, moveY, motionZ);
 +        if(!onGround)
 +        {
-+            motionX *= getAirDrag();
-+            motionY *= getAirDrag();
-+            motionZ *= getAirDrag();
++            motionX *= dragAir;
++            motionY *= dragAir;
++            motionZ *= dragAir;
 +        }
 +    }
 +    
@@ -551,7 +533,7 @@
          if(fuel > 0)
          {
              fuel--;
-@@ -626,12 +775,8 @@
+@@ -626,12 +755,8 @@
          int l = worldObj.getBlockId(i, j, k);
          if(BlockRail.isRailBlock(l))
          {
@@ -565,7 +547,7 @@
              if(i1 >= 2 && i1 <= 5)
              {
                  d1 = j + 1;
-@@ -684,13 +829,14 @@
+@@ -684,13 +809,14 @@
      protected void writeEntityToNBT(NBTTagCompound nbttagcompound)
      {
          nbttagcompound.setInteger("Type", minecartType);
@@ -584,7 +566,7 @@
          {
              NBTTagList nbttaglist = new NBTTagList();
              for(int i = 0; i < cargoItems.length; i++)
-@@ -711,13 +857,13 @@
+@@ -711,13 +837,13 @@
      protected void readEntityFromNBT(NBTTagCompound nbttagcompound)
      {
          minecartType = nbttagcompound.getInteger("Type");
@@ -601,24 +583,24 @@
          {
              NBTTagList nbttaglist = nbttagcompound.getTagList("Items");
              cargoItems = new ItemStack[getSizeInventory()];
-@@ -736,6 +882,16 @@
+@@ -736,6 +862,16 @@
  
      public void applyEntityCollision(Entity entity)
      {
 +    	ForgeHooks.onMinecartEntityCollision(this, entity);
 +    	
-+    	/*
++    	
 +    	if (getCollisionHandler() != null)
 +    	{
 +    		getCollisionHandler().onEntityCollision(this, entity);
 +    		return;
 +    	}
-+    	*/
++    	
 +    	
          if(worldObj.singleplayerWorld)
          {
              return;
-@@ -744,7 +900,7 @@
+@@ -744,7 +880,7 @@
          {
              return;
          }
@@ -627,7 +609,7 @@
          {
              entity.mountEntity(this);
          }
-@@ -782,7 +938,7 @@
+@@ -782,7 +918,7 @@
                  }
                  double d7 = entity.motionX + motionX;
                  double d8 = entity.motionZ + motionZ;
@@ -636,7 +618,7 @@
                  {
                      motionX *= 0.20000000298023224D;
                      motionZ *= 0.20000000298023224D;
-@@ -790,7 +946,7 @@
+@@ -790,7 +926,7 @@
                      entity.motionX *= 0.94999998807907104D;
                      entity.motionZ *= 0.94999998807907104D;
                  } else
@@ -645,7 +627,7 @@
                  {
                      entity.motionX *= 0.20000000298023224D;
                      entity.motionZ *= 0.20000000298023224D;
-@@ -818,7 +974,7 @@
+@@ -818,7 +954,7 @@
  
      public int getSizeInventory()
      {
@@ -654,7 +636,7 @@
      }
  
      public ItemStack getStackInSlot(int i)
-@@ -873,7 +1029,12 @@
+@@ -873,7 +1009,12 @@
  
      public boolean interact(EntityPlayer entityplayer)
      {
@@ -668,7 +650,7 @@
          {
              if(riddenByEntity != null && (riddenByEntity instanceof EntityPlayer) && riddenByEntity != entityplayer)
              {
-@@ -884,14 +1045,14 @@
+@@ -884,14 +1025,14 @@
                  entityplayer.mountEntity(this);
              }
          } else
@@ -685,7 +667,7 @@
          {
              ItemStack itemstack = entityplayer.inventory.getCurrentItem();
              if(itemstack != null && itemstack.itemID == Item.coal.shiftedIndex)
-@@ -917,7 +1078,7 @@
+@@ -917,7 +1058,7 @@
          return entityplayer.getDistanceSqToEntity(this) <= 64D;
      }
  
@@ -694,7 +676,7 @@
      {
          return (dataWatcher.getWatchableObjectByte(16) & 1) != 0;
      }
-@@ -970,5 +1131,135 @@
+@@ -970,5 +1111,154 @@
      {
          return dataWatcher.getWatchableObjectInt(18);
      }
@@ -792,7 +774,6 @@
 +        return false;
 +    }
 +    
-+    protected boolean canUseRail = true;
 +    /** 
 +     * Returns true if this cart can currently use rails.
 +     * This function is mainly used to gracefully detach a minecart from a rail.
@@ -829,5 +810,25 @@
 +    public int getMinecartType()
 +    {
 +        return minecartType;
++    }
++    
++    /**
++     * Gets the current global Minecart Collision handler if none
++     * is registered, returns null
++     * @return The collision handler or null
++     */
++    public static IMinecartCollisionHandler getCollisionHandler()
++    {
++    	return collisionHandler;
++    }
++    
++    /**
++     * Sets the global Minecart Collision handler, overwrites any
++     * that is currently set.
++     * @param handler The new handler
++     */
++    public static void setCollisionHandler(IMinecartCollisionHandler handler)
++    {
++    	collisionHandler = handler;
 +    }
  }
