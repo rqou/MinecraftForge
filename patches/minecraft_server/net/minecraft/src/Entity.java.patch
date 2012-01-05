@@ -23,15 +23,18 @@
      public DataWatcher getDataWatcher()
      {
          return dataWatcher;
-@@ -873,6 +889,7 @@
+@@ -873,6 +889,10 @@
          nbttagcompound.setShort("Fire", (short)fire);
          nbttagcompound.setShort("Air", (short)getAir());
          nbttagcompound.setBoolean("OnGround", onGround);
-+        nbttagcompound.setCompoundTag("ForgeEntityData", customEntityData);
++        if (customEntityData != null)
++        {
++        	nbttagcompound.setCompoundTag("ForgeEntityData", customEntityData);
++        }
          writeEntityToNBT(nbttagcompound);
      }
  
-@@ -907,6 +924,10 @@
+@@ -907,6 +927,10 @@
          onGround = nbttagcompound.getBoolean("OnGround");
          setPosition(posX, posY, posZ);
          setRotation(rotationYaw, rotationPitch);
