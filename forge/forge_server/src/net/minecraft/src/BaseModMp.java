@@ -13,11 +13,6 @@ public abstract class BaseModMp extends BaseMod
         return toString().hashCode();
     }
 
-    public void ModsLoaded()
-    {
-        ModLoaderMp.InitModLoaderMp();
-    }
-
     public void HandlePacket(Packet230ModLoader packet230modloader, EntityPlayerMP entityplayermp)
     {
     }

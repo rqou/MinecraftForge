@@ -2,7 +2,6 @@ package net.minecraft.src;
 
 import java.util.Map;
 import java.util.Random;
-import net.minecraft.client.Minecraft;
 
 public abstract class BaseMod
 {
@@ -19,8 +18,7 @@ public abstract class BaseMod
     {
     }
 
-    public boolean DispenseEntity(World world, double d, double d1, double d2,
-            int i, int j, ItemStack itemstack)
+    public boolean DispenseEntity(World world, double d, double d1, double d2, int i, int j, ItemStack itemstack)
     {
         return false;
     }
@@ -45,10 +43,6 @@ public abstract class BaseMod
 
     public abstract String getVersion();
 
-    public void KeyboardEvent(KeyBinding keybinding)
-    {
-    }
-
     public abstract void load();
 
     public void ModsLoaded()
@@ -59,9 +53,27 @@ public abstract class BaseMod
     {
     }
 
-    public boolean OnTickInGame(float f, Minecraft minecraft)
+    public boolean OnTickInGame(World world) //Changed from taking a reference to Minecraft, to taking a reference to the world.
     {
         return false;
+    }
+
+    public void TakenFromCrafting(EntityPlayer entityplayer, ItemStack itemstack, IInventory iinventory)
+    {
+    }
+
+    public void TakenFromFurnace(EntityPlayer entityplayer, ItemStack itemstack)
+    {
+    }
+
+    public String toString()
+    {
+        return getName() + ' ' + getVersion();
+    }
+
+    /* TODO: Move to a Client Side Only Interface
+    public void KeyboardEvent(KeyBinding keybinding)
+    {
     }
 
     public boolean OnTickInGUI(float f, Minecraft minecraft, GuiScreen guiscreen)
@@ -81,17 +93,5 @@ public abstract class BaseMod
     {
         return false;
     }
-
-    public void TakenFromCrafting(EntityPlayer entityplayer, ItemStack itemstack, IInventory iinventory)
-    {
-    }
-
-    public void TakenFromFurnace(EntityPlayer entityplayer, ItemStack itemstack)
-    {
-    }
-
-    public String toString()
-    {
-        return (new StringBuilder(String.valueOf(getName()))).append(' ').append(getVersion()).toString();
-    }
+    */
 }

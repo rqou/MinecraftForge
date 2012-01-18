@@ -68,7 +68,7 @@ public final class ModLoader
     private static FileHandler logHandler = null;
     private static Method method_RegisterEntityID = null;
     private static Method method_RegisterTileEntity = null;
-    private static File modDir; /* Moved to init()  = new File(Minecraft.getMinecraftDir(), "/mods/"); */
+    private static File moddir; /* Moved to init()  = new File(Minecraft.getMinecraftDir(), "/mods/"); */
     private static final LinkedList<BaseMod> modList = new LinkedList<BaseMod>();
     private static int nextBlockModelID = 1000;
     private static final Map<Integer, HashMap<String, Integer>> overrides = new HashMap<Integer, HashMap<String, Integer>>();
@@ -84,6 +84,7 @@ public final class ModLoader
     /*
     private static String langPack = null;
     */
+    private static boolean isClient = true;
     
     public static void AddAchievementDesc(Achievement achievement, String name, String desc)
     {
@@ -599,22 +600,39 @@ public final class ModLoader
 
     private static void init()
     {
+        if (hasInit)
+        {
+        	return;
+        }
         hasInit = true;
 
-        try
+        if (cfgdir == null)
         {
-            String basePath = (net.minecraft.src.ModLoader.class).getProtectionDomain().getCodeSource().getLocation().toURI().getPath();
-            basePath = basePath.substring(0, basePath.lastIndexOf('/'));
-            cfgdir = new File(basePath, "/config/");
-            cfgfile = new File(basePath, "/config/ModLoader.cfg");
-            logfile = new File(basePath, "ModLoader.txt");
-            modDir = new File(basePath, "/mods/");
+	        try
+	        {
+	            String basePath = ModLoader.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath();
+	            basePath = basePath.substring(0, basePath.lastIndexOf('/'));
+	            cfgdir = new File(basePath, "/config/");
+	            cfgfile = new File(basePath, "/config/ModLoader.cfg");
+	            logfile = new File(basePath, "ModLoader.txt");
+	            moddir = new File(basePath, "/mods/");
+	        }
+	        catch (URISyntaxException urisyntaxexception)
+	        {
+	            getLogger().throwing("ModLoader", "Init", urisyntaxexception);
+	            ThrowException("ModLoader", urisyntaxexception);
+	            return;
+	        }
         }
-        catch (URISyntaxException urisyntaxexception)
+        
+        try 
         {
-            getLogger().throwing("ModLoader", "Init", urisyntaxexception);
-            ThrowException("ModLoader", urisyntaxexception);
-            return;
+        	ModLoader.class.getClassLoader().loadClass("net.minecraft.client.Minecraft");
+        	isClient = true;
+        } 
+        catch (ClassNotFoundException ex)
+        {
+        	isClient = false;
         }
         
         /* TODO: Move all these commented out stuff to a client side only class
@@ -740,9 +758,9 @@ public final class ModLoader
             logger.fine(VERSION + " Initializing...");
             System.out.println(VERSION + " Initializing...");
             
-            modDir.mkdirs();
+            moddir.mkdirs();
             readFromClassPath(new File(ModLoader.class.getProtectionDomain().getCodeSource().getLocation().toURI()));
-            readFromModFolder(modDir);
+            readFromModFolder(moddir);
             sortModList();
             
         	for (BaseMod mod : modList)
@@ -1871,4 +1889,37 @@ public final class ModLoader
     private ModLoader()
     {
     }
+    
+    /**
+     * Used to determine if the mod is running on the Client, or on the Server
+     * @return True if the client, false otherwise
+     */
+    public boolean isClient()
+    {
+    	return isClient;
+    }
+    
+    /*************************************************************************
+     * ModLoader MP Changes that break the side agnostic nature of this class.
+     *************************************************************************/
+
+	public static Object getMinecraftServerInstance() 
+	{
+		if (isClient)
+			return null;
+		else
+			return ModLoaderMp.getMinecraftServerInstance();
+	}
+	
+	public static void setDirectories(File configDir, File configFile, File logFile, File modDir)
+	{
+		if (cfgdir != null)
+		{
+			ThrowException("setDirectories", new Exception("Tried to set directories after they have already been set"));
+		}
+        cfgdir = configDir;
+        cfgfile = configFile;
+        logfile = logFile;
+        moddir = modDir;
+	}
 }

@@ -9,19 +9,22 @@
  import net.minecraft.src.NetworkListenThread;
  import net.minecraft.src.Packet4UpdateTime;
  import net.minecraft.src.PropertyManager;
-@@ -99,6 +101,7 @@
+@@ -99,6 +101,9 @@
          threadcommandreader.setDaemon(true);
          threadcommandreader.start();
          ConsoleLogManager.init();
++        
 +        ModLoaderMp.Init(this);
++        
          logger.info("Starting minecraft server version 1.1");
          if (Runtime.getRuntime().maxMemory() / 1024L / 1024L < 512L)
          {
-@@ -399,6 +402,7 @@
+@@ -399,6 +404,8 @@
  
      private void doTick()
      {
 +    	ModLoaderMp.OnTick(this);
++    	
          long l = System.nanoTime();
          ArrayList arraylist = new ArrayList();
          for (Iterator iterator = field_6037_b.keySet().iterator(); iterator.hasNext();)
