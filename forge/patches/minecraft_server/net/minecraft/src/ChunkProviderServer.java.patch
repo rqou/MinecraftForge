@@ -1,0 +1,10 @@
+--- ../src_base/minecraft_server/net/minecraft/src/ChunkProviderServer.java	0000-00-00 00:00:00.000000000 -0000
++++ ../src_work/minecraft_server/net/minecraft/src/ChunkProviderServer.java	0000-00-00 00:00:00.000000000 -0000
+@@ -175,6 +175,7 @@
+             if (serverChunkGenerator != null)
+             {
+                 serverChunkGenerator.populate(ichunkprovider, i, j);
++                ModLoader.PopulateChunk(this.serverChunkGenerator, i << 4, j << 4, this.world);
+                 chunk.setChunkModified();
+             }
+         }

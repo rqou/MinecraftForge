@@ -29,8 +29,6 @@ pushd src > /dev/null
 
     if [ -f ../jars/bin/minecraft.jar ];
     then
-        cp ../forge/MLProp.java minecraft/net/minecraft/src/MLProp.java
-    
         for i in `find ../forge/patches/minecraft/ -type f`
         do
             patch -p2 -i $i
@@ -40,10 +38,6 @@ pushd src > /dev/null
 
     if [ -f ../jars/minecraft_server.jar ];
     then
-        cp ../forge/MLProp.java minecraft_server/net/minecraft/src/MLProp.java
-    
-        patch -p2 -i ../forge/modLoaderMP.patch
-    
         for i in `find ../forge/patches/minecraft_server/ -type f`
         do
             patch -p2 -i $i

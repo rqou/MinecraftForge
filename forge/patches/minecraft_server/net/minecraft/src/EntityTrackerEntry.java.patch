@@ -1,0 +1,64 @@
+--- ../src_base/minecraft_server/net/minecraft/src/EntityTrackerEntry.java	0000-00-00 00:00:00.000000000 -0000
++++ ../src_work/minecraft_server/net/minecraft/src/EntityTrackerEntry.java	0000-00-00 00:00:00.000000000 -0000
+@@ -1,6 +1,7 @@
+ package net.minecraft.src;
+ 
+ import java.io.PrintStream;
++import java.lang.reflect.Field;
+ import java.util.*;
+ 
+ public class EntityTrackerEntry
+@@ -248,7 +249,52 @@
+         {
+             System.out.println("Fetching addPacket for removed entity");
+         }
+-        if (trackedEntity instanceof EntityItem)
++        EntityTrackerEntry2 var1 = ModLoaderMp.HandleEntityTrackerEntries(this.trackedEntity);
++        if (var1 != null)
++        {
++            try
++            {
++                if (this.trackedEntity instanceof ISpawnable)
++                {
++                    Packet230ModLoader var11 = ((ISpawnable)this.trackedEntity).getSpawnPacket();
++                    var11.modId = "Spawn".hashCode();
++                    if (var1.entityId > 127)
++                    {
++                        var11.packetType = var1.entityId - 256;
++                    }
++                    else
++                    {
++                        var11.packetType = var1.entityId;
++                    }
++
++                    return var11;
++                }
++                else if (!var1.entityHasOwner)
++                {
++                    return new Packet23VehicleSpawn(this.trackedEntity, var1.entityId);
++                }
++                else
++                {
++                    Field var10 = this.trackedEntity.getClass().getField("owner");
++                    if (Entity.class.isAssignableFrom(var10.getType()))
++                    {
++                        Entity var12 = (Entity)var10.get(this.trackedEntity);
++                        return new Packet23VehicleSpawn(this.trackedEntity, var1.entityId, var12 == null ? this.trackedEntity.entityId : var12.entityId);
++                    }
++                    else
++                    {
++                        throw new Exception(String.format("Entity\s owner field must be of type Entity, but it is of type %s.", new Object[] {var10.getType()}));
++                    }
++                }
++            }
++            catch (Exception var4)
++            {
++                ModLoader.getLogger().throwing("EntityTrackerEntry", "getSpawnPacket", var4);
++                ModLoader.ThrowException(String.format("Error sending spawn packet for entity of type %s.", new Object[] {this.trackedEntity.getClass()}), var4);
++                return null;
++            }
++        }
++        else if (trackedEntity instanceof EntityItem)
+         {
+             EntityItem entityitem = (EntityItem)trackedEntity;
+             Packet21PickupSpawn packet21pickupspawn = new Packet21PickupSpawn(entityitem);

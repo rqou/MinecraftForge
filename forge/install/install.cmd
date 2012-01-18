@@ -17,8 +17,6 @@ if exist runtime\bin\fernflower.jar-backup move runtime\bin\fernflower.jar-backu
 pushd src >nul
 
     if exist ..\jars\bin\minecraft.jar (
-        del minecraft\net\minecraft\src\MLProp.java
-        copy ..\forge\MLProp.java minecraft\net\minecraft\src\MLProp.java
         
         for /f "delims=" %%a in ('dir /a -d /b /S ..\forge\patches\minecraft') do (
             pushd "%%a" 2>nul
@@ -30,12 +28,6 @@ pushd src >nul
     )
     
     if exist ..\jars\minecraft_server.jar (
-        del minecraft_server\net\minecraft\src\MLProp.java
-        copy ..\forge\MLProp.java minecraft_server\net\minecraft\src\MLProp.java
-
-        ..\runtime\bin\python\python_mcp ..\forge\lfcr.py ../forge/modLoaderMP.patch ../forge/modLoaderMP.patch
-        ..\runtime\bin\applydiff.exe -uf -p2 -i ../forge/modLoaderMP.patch
-        
         for /f "delims=" %%a in ('dir /a -d /b /S ..\forge\patches\minecraft_server') do (
             pushd "%%a" 2>nul
             if errorlevel 1 (

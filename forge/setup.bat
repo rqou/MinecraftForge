@@ -7,16 +7,6 @@ pushd .. >nul
 
   cmd /C decompile.bat
 
-  pushd src >nul
-    del minecraft\net\minecraft\src\MLProp.java
-    copy ..\forge\MLProp.java minecraft\net\minecraft\src\MLProp.java
-    del minecraft_server\net\minecraft\src\MLProp.java
-    copy ..\forge\MLProp.java minecraft_server\net\minecraft\src\MLProp.java
-    ..\runtime\bin\python\python_mcp ..\forge\lfcr.py ..\forge\modLoaderMP.patch ..\forge\modLoaderMP-win.patch
-    ..\runtime\bin\applydiff.exe -uf -p2 < ..\forge\modLoaderMP-win.patch
-    del ..\forge\modLoaderMP-win.patch
-  popd >nul
-
   cmd /C updatemd5.bat
 
   mkdir src_base
