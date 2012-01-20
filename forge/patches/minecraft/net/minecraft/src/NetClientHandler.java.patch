@@ -1,0 +1,128 @@
+--- ../src_base/minecraft/net/minecraft/src/NetClientHandler.java	0000-00-00 00:00:00.000000000 -0000
++++ ../src_work/minecraft/net/minecraft/src/NetClientHandler.java	0000-00-00 00:00:00.000000000 -0000
+@@ -3,7 +3,9 @@
+ import java.io.*;
+ import java.net.*;
+ import java.util.*;
++
+ import net.minecraft.client.Minecraft;
++import net.minecraft.src.forge.network.MessageManager;
+ 
+ public class NetClientHandler extends NetHandler
+ {
+@@ -18,6 +20,7 @@
+     public List playerNames;
+     public int currentServerMaxPlayers;
+     Random rand;
++    private HashSet<String> packetChannels =  new HashSet<String>();
+ 
+     public NetClientHandler(Minecraft minecraft, String s, int i)
+     throws UnknownHostException, IOException
+@@ -552,6 +555,10 @@
+         }
+         else if (packet2handshake.username.equals("-"))
+         {
++            Packet250CustomPayload pkt = new Packet250CustomPayload();
++            pkt.field_44012_a = "Forge";
++            pkt.field_44010_b = 0;
++            addToSendQueue(pkt);
+             addToSendQueue(new Packet1Login(mc.session.username, 23));
+         }
+         else
+@@ -564,6 +571,10 @@
+                 bufferedreader.close();
+                 if (s1.equalsIgnoreCase("ok"))
+                 {
++                    Packet250CustomPayload pkt = new Packet250CustomPayload();
++                    pkt.field_44012_a = "Forge";
++                    pkt.field_44010_b = 0;
++                    addToSendQueue(pkt);
+                     addToSendQueue(new Packet1Login(mc.session.username, 23));
+                 }
+                 else
+@@ -957,4 +968,85 @@
+     {
+         addToSendQueue(new Packet0KeepAlive(packet0keepalive.randomId));
+     }
++    
++
++    
++    public void addChannel(String channel)
++    {
++        packetChannels.add(channel);
++    }
++    public void removeChannel(String channel)
++    {
++        packetChannels.remove(channel);
++    }
++    public Set<String> getPluginChannels()
++    {
++        return Collections.unmodifiableSet(packetChannels);
++    }
++
++    @Override
++    public void func_44028_a(Packet250CustomPayload packet)
++    {
++        if (packet.field_44012_a.equals("REGISTER")) 
++        {
++            try 
++            {
++                String channels = new String(packet.field_44011_c, "UTF8");
++                for (String channel : channels.split("\0")) 
++                {
++                    addChannel(channel);
++                }
++            } 
++            catch (UnsupportedEncodingException e) 
++            {
++                // TODO Auto-generated catch block
++                e.printStackTrace();
++            }
++        } 
++        else if (packet.field_44012_a.equals("UNREGISTER")) 
++        {
++            try 
++            {
++                String channels = new String(packet.field_44011_c, "UTF8");
++                for (String channel : channels.split("\0")) 
++                {
++                   removeChannel(channel);
++                }
++            } 
++            catch (UnsupportedEncodingException e) 
++            {
++                // TODO Auto-generated catch block
++                e.printStackTrace();
++            }
++        } 
++        else if (packet.field_44012_a.equals("Forge")) 
++        {
++            if (packet.field_44010_b < 4)
++            {
++                netManager.networkShutdown("disconnect.kicked", new Object[0]);
++                disconnected = true;
++                mc.changeWorld1(null);
++                mc.displayGuiScreen(new GuiDisconnected("disconnect.disconnected", "disconnect.genericReason", new Object[]
++                        { "Invalid Forge Packet: Length must be greater then or equal to 4" }));
++                return;
++            }
++            byte[] data = packet.field_44011_c;
++            int modID = ((data[0] & 0xFF << 24) | (data[1] & 0xFF << 16) | (data[2] & 0xFF << 8) | (data[3] & 0xFF));
++            if (modID == 0)
++            {
++                if (data[4] == 0)
++                {
++                    Packet250CustomPayload out = new Packet250CustomPayload();
++                    out.field_44012_a = "Forge";
++                    out.field_44011_c = new byte[]{0, 0, 0, 0, 0};
++                    out.field_44010_b = out.field_44011_c.length;
++                    this.addToSendQueue(out);
++                }
++            }
++        }
++        else 
++        {
++            MessageManager.dispatchMessage(mc.thePlayer, packet.field_44012_a, packet.field_44011_c);
++        }
++    }
+ }

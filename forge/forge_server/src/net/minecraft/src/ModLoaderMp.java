@@ -69,7 +69,7 @@ public class ModLoaderMp
 
     public static void HandleAllLogins(EntityPlayerMP player)
     {
-        init();
+        init();        
         sendModCheck(player);
         for (BaseMod mod : ModLoader.getLoadedMods())
         {
@@ -247,7 +247,49 @@ public class ModLoaderMp
 
     private static void sendPacketTo(EntityPlayerMP player, Packet230ModLoader packet)
     {
-        player.playerNetServerHandler.sendPacket(packet);
+        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+        DataOutputStream dos = new DataOutputStream(bytes);
+        try 
+        {
+            packet.writePacketData(dos);
+            dos.flush();
+            byte[] data = bytes.toByteArray();
+            if (data.length >= 32750)
+            {
+                for (int x = 0; x < data.length; x += 32750)
+                {
+                    Packet250CustomPayload pkt = new Packet250CustomPayload();
+                    bytes.reset();
+                    dos.writeInt(0);           //ModID: Forge
+                    dos.writeByte(1);          //PktID: MLMP Packet
+                    dos.writeInt(data.length); //Total Data Len
+                    dos.writeInt(x);           //Current Data offset
+                    dos.write(data, x, Math.min(data.length - x, 32750));
+                    pkt.field_44005_a = "Forge";
+                    pkt.field_44004_c = bytes.toByteArray();
+                    pkt.field_44003_b = pkt.field_44004_c.length;
+                    player.playerNetServerHandler.sendPacket(pkt);
+                }
+            }
+            else
+            {
+                Packet250CustomPayload pkt = new Packet250CustomPayload();
+                bytes.reset();
+                dos.writeInt(0);           //ModID: Forge
+                dos.writeByte(1);          //PktID: MLMP Packet
+                dos.writeInt(data.length); //Total Data Len
+                dos.writeInt(0);           //Current Data offset
+                dos.write(data);
+                pkt.field_44005_a = "Forge";
+                pkt.field_44004_c = bytes.toByteArray();
+                pkt.field_44003_b = pkt.field_44004_c.length;
+                player.playerNetServerHandler.sendPacket(pkt);   
+            }
+        } 
+        catch (IOException e) 
+        {
+            e.printStackTrace();
+        }
     }
 
     private static void sendModCheck(EntityPlayerMP player)
@@ -505,7 +547,7 @@ public class ModLoaderMp
         long l = 0L;
         if (server.worldMngr != null)
         {
-        	if (clock.length != server.worldMngr.length)
+        	if (clock == null || clock.length != server.worldMngr.length)
         	{
         		clock = new long[server.worldMngr.length];
         	}
@@ -554,7 +596,7 @@ public class ModLoaderMp
         {
             try
             {
-                method_getNextWindowId = EntityPlayerMP.class.getDeclaredMethod("aH");
+                method_getNextWindowId = EntityPlayerMP.class.getDeclaredMethod("aS");
             }
             catch (NoSuchMethodException var3)
             {
@@ -565,7 +607,7 @@ public class ModLoaderMp
 
             try
             {
-                field_currentWindowId = EntityPlayerMP.class.getDeclaredField("ci");
+                field_currentWindowId = EntityPlayerMP.class.getDeclaredField("cl");
             }
             catch (NoSuchFieldException var2)
             {

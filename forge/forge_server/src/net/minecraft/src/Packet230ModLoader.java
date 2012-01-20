@@ -74,7 +74,7 @@ public class Packet230ModLoader extends Packet
                         }));
             }
             byte abyte0[] = new byte[k1];
-            datainputstream.read(abyte0, 0, k1);
+            datainputstream.readFully(abyte0, 0, k1);
             dataString[j1] = new String(abyte0);
         }
     }

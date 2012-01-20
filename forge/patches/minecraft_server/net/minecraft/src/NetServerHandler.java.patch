@@ -1,6 +1,31 @@
 --- ../src_base/minecraft_server/net/minecraft/src/NetServerHandler.java	0000-00-00 00:00:00.000000000 -0000
 +++ ../src_work/minecraft_server/net/minecraft/src/NetServerHandler.java	0000-00-00 00:00:00.000000000 -0000
-@@ -295,7 +295,9 @@
+@@ -1,9 +1,15 @@
+ package net.minecraft.src;
+ 
++import java.io.ByteArrayInputStream;
++import java.io.ByteArrayOutputStream;
++import java.io.DataInputStream;
++import java.io.IOException;
+ import java.io.PrintStream;
++import java.io.UnsupportedEncodingException;
+ import java.util.*;
+ import java.util.logging.Logger;
+ import net.minecraft.server.MinecraftServer;
++import net.minecraft.src.forge.network.MessageManager;
+ 
+ public class NetServerHandler extends NetHandler
+     implements ICommandListener
+@@ -26,6 +32,8 @@
+     private double lastPosZ;
+     private boolean hasMoved;
+     private IntHashMap field_10_k;
++    
++    public boolean hasForge = false;
+ 
+     public NetServerHandler(MinecraftServer minecraftserver, NetworkManager networkmanager, EntityPlayerMP entityplayermp)
+     {
+@@ -295,7 +303,9 @@
              double d1 = (playerEntity.posY - ((double)j + 0.5D)) + 1.5D;
              double d3 = playerEntity.posZ - ((double)k + 0.5D);
              double d5 = d * d + d1 * d1 + d3 * d3;
@@ -11,7 +36,7 @@
              {
                  return;
              }
-@@ -366,7 +368,9 @@
+@@ -366,7 +376,9 @@
              {
                  j1 = i1;
              }
@@ -22,7 +47,7 @@
              {
                  playerEntity.itemInWorldManager.activeBlockOrUseItem(playerEntity, worldserver, itemstack, i, j, k, l);
              }
-@@ -513,6 +517,10 @@
+@@ -513,6 +525,10 @@
                  }
              }
          }
@@ -33,3 +58,127 @@
          else if (mcServer.configManager.isOp(playerEntity.username))
          {
              String s1 = s.substring(1);
+@@ -760,4 +776,123 @@
+     {
+         return true;
+     }
++    
++    private ByteArrayOutputStream mlmpData;
++    
++    @Override
++    public void func_44001_a(Packet250CustomPayload packet)
++    {
++        if (packet.field_44005_a.equals("REGISTER")) 
++        {
++            try 
++            {
++                String channels = new String(packet.field_44004_c, "UTF8");
++                for (String channel : channels.split("\0")) 
++                {
++                    playerEntity.addChannel(channel);
++                }
++            } 
++            catch (UnsupportedEncodingException e) 
++            {
++                // TODO Auto-generated catch block
++                e.printStackTrace();
++            }
++        } 
++        else if (packet.field_44005_a.equals("UNREGISTER")) 
++        {
++            try 
++            {
++                String channels = new String(packet.field_44004_c, "UTF8");
++                for (String channel : channels.split("\0")) 
++                {
++                    playerEntity.removeChannel(channel);
++                }
++            } 
++            catch (UnsupportedEncodingException e) 
++            {
++                // TODO Auto-generated catch block
++                e.printStackTrace();
++            }
++        } 
++        else  if (packet.field_44005_a.equals("Forge"))
++        {
++            if (packet.field_44003_b < 4)
++            {
++                kickPlayer("Invalid Forge Packet: Length must be greater then or equal to 4");
++                return;
++            }
++            int modID = ((packet.field_44004_c[0] & 0xFF << 24) | (packet.field_44004_c[1] & 0xFF << 16) | (packet.field_44004_c[2] & 0xFF << 8) | (packet.field_44004_c[3] & 0xFF));
++
++            byte[] data = new byte[packet.field_44003_b - 4];
++            for (int x = 0; x < packet.field_44003_b - 4; x++)
++            {
++                data[x] = packet.field_44004_c[x + 4];
++            }
++            
++            if (modID == 0)
++            {
++                if (!hasForge)
++                {
++                    hasForge = true;
++                    WorldServer world = mcServer.getWorldManager(playerEntity.dimension);
++                    ChunkCoordinates spawn = world.getSpawnPoint();
++                    
++                    sendPacket(new Packet1Login("", playerEntity.entityId, world.getRandomSeed(), world.getWorldInfo().func_46069_q(), 
++                            playerEntity.itemInWorldManager.getGameType(), (byte)world.worldProvider.worldType, (byte)world.difficultySetting, 
++                            (byte)world.worldHeight, (byte)mcServer.configManager.getMaxPlayers()));
++                    
++                    sendPacket(new Packet6SpawnPosition(spawn.posX, spawn.posY, spawn.posZ));
++                    mcServer.configManager.func_28170_a(playerEntity, world);
++                    mcServer.configManager.sendPacketToAllPlayers(new Packet3Chat("\247e" + playerEntity.username + " joined the game."));
++                    mcServer.configManager.playerLoggedIn(playerEntity);
++                    teleportTo(playerEntity.posX, playerEntity.posY, playerEntity.posZ, playerEntity.rotationYaw, playerEntity.rotationPitch);
++                    sendPacket(new Packet4UpdateTime(world.getWorldTime()));
++                    
++                    for (PotionEffect effect : (Collection<PotionEffect>)playerEntity.func_35183_ak())
++                    {
++                        sendPacket(new Packet41EntityEffect(playerEntity.entityId, effect));
++                    }
++                    playerEntity.func_20057_k();
++                    ModLoaderMp.HandleAllLogins(playerEntity);
++                }
++                if (data.length > 0)
++                {
++                    switch(data[0])
++                    {
++                        case 1:
++                            try {
++                                DataInputStream dis = new DataInputStream(new ByteArrayInputStream(data));
++                                int totalLen = dis.readInt();
++                                int offset = dis.readInt();
++                                if (mlmpData != null && offset == 0)
++                                {
++                                    //TODO: Wtfux? Didnt receive all of the last packet 
++                                }
++                                else if (mlmpData == null && offset == 0)
++                                {
++                                    mlmpData = new ByteArrayOutputStream();
++                                    mlmpData.write(data, 9, data.length - 9);
++                                }
++                                if (mlmpData.size() == totalLen)
++                                {
++                                    Packet230ModLoader ml = new Packet230ModLoader();
++                                    ml.readPacketData(new DataInputStream(new ByteArrayInputStream(mlmpData.toByteArray())));
++                                    mlmpData = null;
++                                    ModLoaderMp.HandleAllPackets(ml, playerEntity);
++                                }
++                            } catch (IOException e) {
++                                // TODO Auto-generated catch block
++                                e.printStackTrace();
++                            }
++                            break;
++                    }
++                }
++                
++            }
++        }
++        else
++        {
++            MessageManager.dispatchMessage(playerEntity, packet.field_44005_a, packet.field_44004_c);
++        }
++    }
+ }

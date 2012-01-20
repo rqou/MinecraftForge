@@ -1,10 +1,93 @@
 --- ../src_base/minecraft_server/net/minecraft/src/NetLoginHandler.java	0000-00-00 00:00:00.000000000 -0000
 +++ ../src_work/minecraft_server/net/minecraft/src/NetLoginHandler.java	0000-00-00 00:00:00.000000000 -0000
-@@ -129,6 +129,7 @@
+@@ -1,10 +1,12 @@
+ package net.minecraft.src;
+ 
+ import java.io.IOException;
++import java.io.UnsupportedEncodingException;
+ import java.net.Socket;
+ import java.util.*;
+ import java.util.logging.Logger;
+ import net.minecraft.server.MinecraftServer;
++import net.minecraft.src.forge.network.MessageManager;
+ 
+ public class NetLoginHandler extends NetHandler
+ {
+@@ -17,6 +19,7 @@
+     private String username;
+     private Packet1Login packet1login;
+     private String serverId;
++    private boolean hasForge = false;
+ 
+     public NetLoginHandler(MinecraftServer minecraftserver, Socket socket, String s)
+     throws IOException
+@@ -111,16 +114,20 @@
+             entityplayermp.itemInWorldManager.setWorld((WorldServer)entityplayermp.worldObj);
+             logger.info((new StringBuilder()).append(getUserAndIPString()).append(" logged in with entity id ").append(entityplayermp.entityId).append(" at (").append(entityplayermp.posX).append(", ").append(entityplayermp.posY).append(", ").append(entityplayermp.posZ).append(")").toString());
+             WorldServer worldserver = mcServer.getWorldManager(entityplayermp.dimension);
+-            ChunkCoordinates chunkcoordinates = worldserver.getSpawnPoint();
+             entityplayermp.itemInWorldManager.func_35695_b(worldserver.getWorldInfo().getGameType());
+-            NetServerHandler netserverhandler = new NetServerHandler(mcServer, netManager, entityplayermp);
++            final NetServerHandler netserverhandler = new NetServerHandler(mcServer, netManager, entityplayermp);
++            mcServer.networkServer.addPlayer(netserverhandler);
++            
++            
++            
++            /*
++            ChunkCoordinates spawn = worldserver.getSpawnPoint();
+             netserverhandler.sendPacket(new Packet1Login("", entityplayermp.entityId, worldserver.getRandomSeed(), worldserver.getWorldInfo().func_46069_q(), entityplayermp.itemInWorldManager.getGameType(), (byte)worldserver.worldProvider.worldType, (byte)worldserver.difficultySetting, (byte)worldserver.worldHeight, (byte)mcServer.configManager.getMaxPlayers()));
+-            netserverhandler.sendPacket(new Packet6SpawnPosition(chunkcoordinates.posX, chunkcoordinates.posY, chunkcoordinates.posZ));
++            netserverhandler.sendPacket(new Packet6SpawnPosition(spawn.posX, spawn.posY, spawn.posZ));
+             mcServer.configManager.func_28170_a(entityplayermp, worldserver);
+             mcServer.configManager.sendPacketToAllPlayers(new Packet3Chat((new StringBuilder()).append("\247e").append(entityplayermp.username).append(" joined the game.").toString()));
+             mcServer.configManager.playerLoggedIn(entityplayermp);
+             netserverhandler.teleportTo(entityplayermp.posX, entityplayermp.posY, entityplayermp.posZ, entityplayermp.rotationYaw, entityplayermp.rotationPitch);
+-            mcServer.networkServer.addPlayer(netserverhandler);
+             netserverhandler.sendPacket(new Packet4UpdateTime(worldserver.getWorldTime()));
+             PotionEffect potioneffect;
+             for (Iterator iterator = entityplayermp.func_35183_ak().iterator(); iterator.hasNext(); netserverhandler.sendPacket(new Packet41EntityEffect(entityplayermp.entityId, potioneffect)))
+@@ -129,6 +136,44 @@
              }
  
              entityplayermp.func_20057_k();
-+            ModLoaderMp.HandleAllLogins(entityplayermp);
++                
++            ModLoaderMp.HandleAllLogins(hasForge, entityplayermp);
++            */
++            try 
++            {
++                Packet250CustomPayload pkt = new Packet250CustomPayload();
++                pkt.field_44005_a = "REGISTER";
++                pkt.field_44004_c = "Forge".getBytes("UTF8");
++                pkt.field_44003_b = pkt.field_44004_c.length;
++                netManager.addToSendQueue(pkt); //Register
++                
++                pkt = new Packet250CustomPayload();
++                pkt.field_44005_a = "Forge";
++                pkt.field_44004_c = new byte[]{0, 0, 0, 0, 0};
++                pkt.field_44003_b = pkt.field_44004_c.length;
++                netManager.addToSendQueue(pkt); //Check for mods
++                (new Thread(){
++                    public void run(){
++                        try {
++                            this.sleep(1000);
++                            if (!netserverhandler.hasForge)
++                            {
++                                netserverhandler.kickPlayer("This server requires Minecraft Forge");
++                            }
++                        }
++                        catch (InterruptedException ex)
++                        {}
++                    }
++                }).start();
++            } 
++            catch (UnsupportedEncodingException e) 
++            {
++                // TODO Auto-generated catch block
++                e.printStackTrace();
++                kickUser("Internal server error: " + e.getMessage());
++            }
++            
++            
          }
          finishedProcessing = true;
      }
