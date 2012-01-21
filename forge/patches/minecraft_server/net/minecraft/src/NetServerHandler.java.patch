@@ -66,13 +66,13 @@
 +    private ByteArrayOutputStream mlmpData;
 +    
 +    @Override
-+    public void func_44001_a(Packet250CustomPayload packet)
++    public void handleCustomPayload(Packet250CustomPayload packet)
 +    {
-+        if (packet.field_44005_a.equals("REGISTER")) 
++        if (packet.channel.equals("REGISTER")) 
 +        {
 +            try 
 +            {
-+                String channels = new String(packet.field_44004_c, "UTF8");
++                String channels = new String(packet.data, "UTF8");
 +                for (String channel : channels.split("\0")) 
 +                {
 +                    playerEntity.addChannel(channel);
@@ -84,11 +84,11 @@
 +                e.printStackTrace();
 +            }
 +        } 
-+        else if (packet.field_44005_a.equals("UNREGISTER")) 
++        else if (packet.channel.equals("UNREGISTER")) 
 +        {
 +            try 
 +            {
-+                String channels = new String(packet.field_44004_c, "UTF8");
++                String channels = new String(packet.data, "UTF8");
 +                for (String channel : channels.split("\0")) 
 +                {
 +                    playerEntity.removeChannel(channel);
@@ -100,19 +100,19 @@
 +                e.printStackTrace();
 +            }
 +        } 
-+        else  if (packet.field_44005_a.equals("Forge"))
++        else  if (packet.channel.equals("Forge"))
 +        {
-+            if (packet.field_44003_b < 4)
++            if (packet.length < 4)
 +            {
 +                kickPlayer("Invalid Forge Packet: Length must be greater then or equal to 4");
 +                return;
 +            }
-+            int modID = ((packet.field_44004_c[0] & 0xFF << 24) | (packet.field_44004_c[1] & 0xFF << 16) | (packet.field_44004_c[2] & 0xFF << 8) | (packet.field_44004_c[3] & 0xFF));
++            int modID = ((packet.data[0] & 0xFF << 24) | (packet.data[1] & 0xFF << 16) | (packet.data[2] & 0xFF << 8) | (packet.data[3] & 0xFF));
 +
-+            byte[] data = new byte[packet.field_44003_b - 4];
-+            for (int x = 0; x < packet.field_44003_b - 4; x++)
++            byte[] data = new byte[packet.length - 4];
++            for (int x = 0; x < packet.length - 4; x++)
 +            {
-+                data[x] = packet.field_44004_c[x + 4];
++                data[x] = packet.data[x + 4];
 +            }
 +            
 +            if (modID == 0)
@@ -123,7 +123,7 @@
 +                    WorldServer world = mcServer.getWorldManager(playerEntity.dimension);
 +                    ChunkCoordinates spawn = world.getSpawnPoint();
 +                    
-+                    sendPacket(new Packet1Login("", playerEntity.entityId, world.getRandomSeed(), world.getWorldInfo().func_46069_q(), 
++                    sendPacket(new Packet1Login("", playerEntity.entityId, world.getSeed(), world.getWorldInfo().getTerrainType(), 
 +                            playerEntity.itemInWorldManager.getGameType(), (byte)world.worldProvider.worldType, (byte)world.difficultySetting, 
 +                            (byte)world.worldHeight, (byte)mcServer.configManager.getMaxPlayers()));
 +                    
@@ -178,7 +178,7 @@
 +        }
 +        else
 +        {
-+            MessageManager.dispatchMessage(playerEntity, packet.field_44005_a, packet.field_44004_c);
++            MessageManager.dispatchMessage(playerEntity, packet.channel, packet.data);
 +        }
 +    }
  }

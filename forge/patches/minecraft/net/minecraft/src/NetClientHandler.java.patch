@@ -23,8 +23,8 @@
          else if (packet2handshake.username.equals("-"))
          {
 +            Packet250CustomPayload pkt = new Packet250CustomPayload();
-+            pkt.field_44012_a = "Forge";
-+            pkt.field_44010_b = 0;
++            pkt.channel = "Forge";
++            pkt.length = 0;
 +            addToSendQueue(pkt);
              addToSendQueue(new Packet1Login(mc.session.username, 23));
          }
@@ -34,8 +34,8 @@
                  if (s1.equalsIgnoreCase("ok"))
                  {
 +                    Packet250CustomPayload pkt = new Packet250CustomPayload();
-+                    pkt.field_44012_a = "Forge";
-+                    pkt.field_44010_b = 0;
++                    pkt.channel = "Forge";
++                    pkt.length  = 0;
 +                    addToSendQueue(pkt);
                      addToSendQueue(new Packet1Login(mc.session.username, 23));
                  }
@@ -61,13 +61,13 @@
 +    }
 +
 +    @Override
-+    public void func_44028_a(Packet250CustomPayload packet)
++    public void handleCustomPayload(Packet250CustomPayload packet)
 +    {
-+        if (packet.field_44012_a.equals("REGISTER")) 
++        if (packet.channel.equals("REGISTER")) 
 +        {
 +            try 
 +            {
-+                String channels = new String(packet.field_44011_c, "UTF8");
++                String channels = new String(packet.data, "UTF8");
 +                for (String channel : channels.split("\0")) 
 +                {
 +                    addChannel(channel);
@@ -79,11 +79,11 @@
 +                e.printStackTrace();
 +            }
 +        } 
-+        else if (packet.field_44012_a.equals("UNREGISTER")) 
++        else if (packet.channel.equals("UNREGISTER")) 
 +        {
 +            try 
 +            {
-+                String channels = new String(packet.field_44011_c, "UTF8");
++                String channels = new String(packet.data, "UTF8");
 +                for (String channel : channels.split("\0")) 
 +                {
 +                   removeChannel(channel);
@@ -95,9 +95,9 @@
 +                e.printStackTrace();
 +            }
 +        } 
-+        else if (packet.field_44012_a.equals("Forge")) 
++        else if (packet.channel.equals("Forge")) 
 +        {
-+            if (packet.field_44010_b < 4)
++            if (packet.length < 4)
 +            {
 +                netManager.networkShutdown("disconnect.kicked", new Object[0]);
 +                disconnected = true;
@@ -106,21 +106,21 @@
 +                        { "Invalid Forge Packet: Length must be greater then or equal to 4" }));
 +                return;
 +            }
-+            byte[] data = new byte[packet.field_44010_b - 4];
++            byte[] data = new byte[packet.length - 4];
 +            for (int x = 0; x < data.length; x++)
 +            {
-+                data[x] = packet.field_44011_c[x + 4];
++                data[x] = packet.data[x + 4];
 +            }
-+            int modID = ((packet.field_44011_c[0] & 0xFF << 24) | (packet.field_44011_c[1] & 0xFF << 16) | (packet.field_44011_c[2] & 0xFF << 8) | (packet.field_44011_c[3] & 0xFF));
++            int modID = ((packet.data[0] & 0xFF << 24) | (packet.data[1] & 0xFF << 16) | (packet.data[2] & 0xFF << 8) | (packet.data[3] & 0xFF));
 +            if (modID == 0)
 +            {
 +                switch (data[0])
 +                {
 +                    case 0:
 +                        Packet250CustomPayload out = new Packet250CustomPayload();
-+                        out.field_44012_a = "Forge";
-+                        out.field_44011_c = new byte[]{0, 0, 0, 0, 0};
-+                        out.field_44010_b = out.field_44011_c.length;
++                        out.channel = "Forge";
++                        out.data = new byte[]{0, 0, 0, 0, 0};
++                        out.length = out.data.length;
 +                        this.addToSendQueue(out);
 +                        break;
 +                }
@@ -128,7 +128,7 @@
 +        }
 +        else 
 +        {
-+            MessageManager.dispatchMessage(mc.thePlayer, packet.field_44012_a, packet.field_44011_c);
++            MessageManager.dispatchMessage(mc.thePlayer, packet.channel, packet.data);
 +        }
 +    }
  }

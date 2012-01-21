@@ -397,8 +397,8 @@ public final class ModLoader
                     if (entry.entityClass == entityClass)
                     {
                         entry.itemWeight = weight;
-                        entry.field_35484_b = minSpawn;
-                        entry.field_35485_c= maxSpawn;
+                        entry.minGroupCount = minSpawn;
+                        entry.maxGroupCount= maxSpawn;
                         replaced = true;
                         break;
                     }
@@ -1188,10 +1188,10 @@ public final class ModLoader
             init();
             logger.fine("Initialized");
         }
-        Random random = new Random(world.getRandomSeed());
+        Random random = new Random(world.getSeed());
         long l = (random.nextLong() / 2L) * 2L + 1L;
         long l1 = (random.nextLong() / 2L) * 2L + 1L;
-        random.setSeed((long)i * l + (long)j * l1 ^ world.getRandomSeed());
+        random.setSeed((long)i * l + (long)j * l1 ^ world.getSeed());
         
         for (BaseMod mod : modList)
         {

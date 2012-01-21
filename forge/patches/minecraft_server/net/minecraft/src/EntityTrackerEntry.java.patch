@@ -47,7 +47,7 @@
 +                    }
 +                    else
 +                    {
-+                        throw new Exception(String.format("Entity\s owner field must be of type Entity, but it is of type %s.", new Object[] {var10.getType()}));
++                        throw new Exception(String.format("Entitys owner field must be of type Entity, but it is of type %s.", new Object[] {var10.getType()}));
 +                    }
 +                }
 +            }

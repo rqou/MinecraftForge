@@ -265,9 +265,9 @@ public class ModLoaderMp
                     dos.writeInt(data.length); //Total Data Len
                     dos.writeInt(x);           //Current Data offset
                     dos.write(data, x, Math.min(data.length - x, 32750));
-                    pkt.field_44005_a = "Forge";
-                    pkt.field_44004_c = bytes.toByteArray();
-                    pkt.field_44003_b = pkt.field_44004_c.length;
+                    pkt.channel = "Forge";
+                    pkt.data    = bytes.toByteArray();
+                    pkt.length  = pkt.data.length;
                     player.playerNetServerHandler.sendPacket(pkt);
                 }
             }
@@ -280,9 +280,9 @@ public class ModLoaderMp
                 dos.writeInt(data.length); //Total Data Len
                 dos.writeInt(0);           //Current Data offset
                 dos.write(data);
-                pkt.field_44005_a = "Forge";
-                pkt.field_44004_c = bytes.toByteArray();
-                pkt.field_44003_b = pkt.field_44004_c.length;
+                pkt.channel = "Forge";
+                pkt.data    = bytes.toByteArray();
+                pkt.length  = pkt.data.length;
                 player.playerNetServerHandler.sendPacket(pkt);   
             }
         } 

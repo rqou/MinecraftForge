@@ -3,6 +3,8 @@ echo off
 echo MinecraftForge Windows Setup Program
 echo:
 
+set PATH=%PATH%;%SystemDir%\system32;%SystemRoot%\System32
+
 pushd .. >nul
 
 xcopy /Y /E /I forge\conf\* conf
@@ -41,6 +43,7 @@ popd >nul
 
 xcopy /Y /E forge\src\* src
 
-cmd /C updatemcp.bat
-cmd /C updatenames.bat
+rem Removed until MCP's Update Names is fixed
+rem cmd /C updatemcp.bat
+rem cmd /C updatenames.bat
 cmd /C updatemd5.bat

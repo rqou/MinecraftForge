@@ -7,7 +7,7 @@ pushd .. >nul
 
   cmd /C decompile.bat
 
-  cmd /C updatemd5.bat
+  rem cmd /C updatemd5.bat
 
   mkdir src_base
   mkdir src_work
