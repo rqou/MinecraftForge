@@ -7,7 +7,7 @@ import java.lang.reflect.Method;
 import java.net.URISyntaxException;
 import java.util.*;
 import java.util.logging.Logger;
-import net.minecraft.server.MinecraftServer;
+//import net.minecraft.server.MinecraftServer;
 import net.minecraft.src.forge.ObjectPair;
 
 public class ModLoaderMp
@@ -67,6 +67,7 @@ public class ModLoaderMp
         }
     }
 
+    /*
     public static void HandleAllLogins(EntityPlayerMP player)
     {
         init();        
@@ -78,9 +79,10 @@ public class ModLoaderMp
                 ((BaseModMp)mod).HandleLogin(player);
             }
         }
-    }
+    }*/
 
-    public static void HandleAllPackets(Packet230ModLoader packet, EntityPlayerMP player)
+    //public static void HandleAllPackets(Packet230ModLoader packet, EntityPlayerMP player)
+    public static void HandleAllPackets(Packet230ModLoader packet)
     {
         init();
         if (packet.modId == "ModLoaderMP".hashCode())
@@ -88,17 +90,17 @@ public class ModLoaderMp
             switch (packet.packetType)
             {
                 case 0:
-                    handleModCheckResponse(packet, player);
+                    handleModCheckResponse(packet);//, player);
                     break;
 
                 case 1:
-                    handleSendKey(packet, player);
+                    handleSendKey(packet);//, player);
                     break;
             }
         }
         else
         {
-            for (BaseMod mod : ModLoader.getLoadedMods())
+            for (BaseMod mod : (Collection<BaseMod>)ModLoader.getLoadedMods())
             {
                 if (!(mod instanceof BaseModMp))
                 {
@@ -109,12 +111,13 @@ public class ModLoaderMp
                 {
                     continue;
                 }
-                modmp.HandlePacket(packet, player);
+                modmp.HandlePacket(packet);//, player);
                 break;
             }
         }
     }
 
+    /*
     public static void HandleEntityTrackers(EntityTracker entitytracker, Entity entity)
     {
         init();
@@ -127,6 +130,7 @@ public class ModLoaderMp
             }
         }
     }
+   */
 
     public static EntityTrackerEntry2 HandleEntityTrackerEntries(Entity entity)
     {
@@ -140,7 +144,8 @@ public class ModLoaderMp
             return null;
         }
     }
-
+    
+    /*
     public static void SendPacketToAll(BaseModMp mod, Packet230ModLoader packet)
     {
         init();
@@ -158,7 +163,9 @@ public class ModLoaderMp
             return;
         }
     }
+    */
 
+    /*
     private static void sendPacketToAll(Packet packet)
     {
         if (packet != null)
@@ -170,7 +177,9 @@ public class ModLoaderMp
             }
         }
     }
+    */
 
+    /*
     public static void SendPacketTo(BaseModMp mod, EntityPlayerMP player, Packet230ModLoader packet)
     {
         init();
@@ -188,23 +197,26 @@ public class ModLoaderMp
             return;
         }
     }
-
+    */
+    
     public static void Log(String s)
     {
-        MinecraftServer.logger.info(s);
+        //MinecraftServer.logger.info(s);
         ModLoader.getLogger().fine(s);
         System.out.println(s);
     }
 
     public static World GetPlayerWorld(EntityPlayer player)
     {
-        for (World world : ((MinecraftServer)getMinecraftServerInstance()).worldMngr)
+        /*
+        for (World world : getMinecraftServerInstance().worldMngr)
         {
             if (world.playerEntities.contains(player))
             {
                 return world;
             }
         }
+        */
 
         return null;
     }
@@ -216,9 +228,10 @@ public class ModLoaderMp
         	return;
         }
         hasInit = true;
+        /*
         try
         {
-            File file = ((MinecraftServer)getMinecraftServerInstance()).getFile("banned-mods.txt");
+            File file = getMinecraftServerInstance().getFile("banned-mods.txt");
             if (!file.exists())
             {
                 file.createNewFile();
@@ -242,9 +255,11 @@ public class ModLoaderMp
             ModLoader.ThrowException("ModLoaderMultiplayer", ioexception);
             return;
         }
+        */
         Log("ModLoaderMP 1.1 Initialized");
     }
 
+    /*
     private static void sendPacketTo(EntityPlayerMP player, Packet230ModLoader packet)
     {
         ByteArrayOutputStream bytes = new ByteArrayOutputStream();
@@ -291,7 +306,9 @@ public class ModLoaderMp
             e.printStackTrace();
         }
     }
+    */
 
+    /*
     private static void sendModCheck(EntityPlayerMP player)
     {
         Packet230ModLoader packet = new Packet230ModLoader();
@@ -299,7 +316,8 @@ public class ModLoaderMp
         packet.packetType = 0;
         sendPacketTo(player, packet);
     }
-
+    */
+    /*
     private static void handleModCheckResponse(Packet230ModLoader packet, EntityPlayerMP player)
     {
         StringBuilder clientMods = new StringBuilder();
@@ -400,7 +418,8 @@ public class ModLoaderMp
             player.playerNetServerHandler.kickPlayer("You are missing the following mods:" + msg);
         }
     }
-
+    */
+    /*
     private static void handleSendKey(Packet230ModLoader packet, EntityPlayerMP player)
     {
         if (packet.dataInt.length != 2)
@@ -427,7 +446,8 @@ public class ModLoaderMp
             }
         }
     }
-
+    */
+    /*
     public static void getCommandInfo(ICommandListener listener)
     {
         for (BaseMod mod : ModLoader.getLoadedMods())
@@ -438,7 +458,8 @@ public class ModLoaderMp
             }
         }
     }
-
+    */
+    /*
     public static boolean HandleCommand(String command, String username, Logger logger, boolean isOp)
     {
         boolean handled = false;
@@ -456,7 +477,8 @@ public class ModLoaderMp
 
         return handled;
     }
-
+    */
+    
     public static void sendChatToAll(String prefix, String message)
     {
         sendChatToAll(prefix + ": " + message);
@@ -464,6 +486,7 @@ public class ModLoaderMp
 
     public static void sendChatToAll(String message)
     {
+        /*
     	MinecraftServer inst = (MinecraftServer)getMinecraftServerInstance();
         for (EntityPlayerMP player : (List<EntityPlayerMP>)inst.configManager.playerEntities)
         {
@@ -471,6 +494,7 @@ public class ModLoaderMp
         }
 
         MinecraftServer.logger.info(message);
+        */
     }
 
     public static void sendChatToOps(String prefix, String message)
@@ -480,6 +504,7 @@ public class ModLoaderMp
 
     public static void sendChatToOps(String message)
     {
+        /*
     	MinecraftServer inst = (MinecraftServer)getMinecraftServerInstance();
         for (EntityPlayerMP player : (List<EntityPlayerMP>)inst.configManager.playerEntities)
         {
@@ -490,6 +515,7 @@ public class ModLoaderMp
         }
 
         MinecraftServer.logger.info(message);
+        */
     }
 
     public static Packet GetTileEntityPacket(BaseModMp basemodmp, int x, int y, int z, int l, int ai[], float af[], String as[])
@@ -517,12 +543,14 @@ public class ModLoaderMp
 
     public static void SendTileEntityPacket(TileEntity tileentity)
     {
+        /*
         sendPacketToAll(tileentity.getDescriptionPacket());
+        */
     }
 
     public static BaseModMp GetModInstance(Class modCls)
     {
-    	for (BaseMod mod : ModLoader.getLoadedMods())
+    	for (BaseMod mod : (Collection<BaseMod>)ModLoader.getLoadedMods())
     	{
             if (!(mod instanceof BaseModMp))
             {
@@ -539,7 +567,7 @@ public class ModLoaderMp
         return null;
     }
     
-
+    /*
     public static void OnTick(MinecraftServer server)
     {
         init();
@@ -569,7 +597,8 @@ public class ModLoaderMp
             }
         }
     }
-
+    */
+    /*
 	public static void Init(MinecraftServer server) 
 	{
         instance = server;
@@ -631,6 +660,7 @@ public class ModLoaderMp
  
         init();		
 	}
+	*/
 
 	public static Object getMinecraftServerInstance() 
 	{
