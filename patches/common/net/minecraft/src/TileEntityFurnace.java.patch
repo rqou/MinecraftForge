@@ -1,21 +1,23 @@
 --- ../src_base/common/net/minecraft/src/TileEntityFurnace.java
 +++ ../src_work/common/net/minecraft/src/TileEntityFurnace.java
-@@ -1,11 +1,13 @@
+@@ -1,11 +1,15 @@
  package net.minecraft.src;
  
 +import net.minecraftforge.common.ISidedInventory;
++import net.minecraftforge.common.ISpecialInventory;
 +import net.minecraftforge.common.Orientation;
++import net.minecraftforge.common.StackUtil;
  import cpw.mods.fml.common.registry.GameRegistry;
  
  import cpw.mods.fml.common.Side;
  import cpw.mods.fml.common.asm.SideOnly;
  
 -public class TileEntityFurnace extends TileEntity implements IInventory
-+public class TileEntityFurnace extends TileEntity implements IInventory, ISidedInventory
++public class TileEntityFurnace extends TileEntity implements IInventory, ISidedInventory, ISpecialInventory
  {
      /**
       * The ItemStacks that hold the items currently being used in the furnace
-@@ -235,8 +237,7 @@
+@@ -235,8 +239,7 @@
  
                          if (this.furnaceItemStacks[1].stackSize == 0)
                          {
@@ -25,7 +27,7 @@
                          }
                      }
                  }
-@@ -282,8 +283,12 @@
+@@ -282,8 +285,12 @@
          }
          else
          {
@@ -40,7 +42,7 @@
          }
      }
  
-@@ -294,15 +299,15 @@
+@@ -294,15 +301,15 @@
      {
          if (this.canSmelt())
          {
@@ -60,7 +62,7 @@
              }
  
              --this.furnaceItemStacks[0].stackSize;
-@@ -329,7 +334,7 @@
+@@ -329,7 +336,7 @@
              int var1 = par0ItemStack.getItem().shiftedIndex;
              Item var2 = par0ItemStack.getItem();
  
@@ -69,7 +71,7 @@
              {
                  Block var3 = Block.blocksList[var1];
  
-@@ -374,4 +379,18 @@
+@@ -374,4 +381,106 @@
      public void openChest() {}
  
      public void closeChest() {}
@@ -86,5 +88,93 @@
 +    public int getSizeInventorySide(Orientation side)
 +    {
 +        return 1;
++    }
++
++    @Override
++    public int addItem(ItemStack stack, boolean doAdd, Orientation from)
++    {
++        if(from == Orientation.DOWN && !TileEntityFurnace.isItemFuel(stack))
++            return 0;
++        
++        if(from == Orientation.UP && FurnaceRecipes.smelting().getSmeltingResult(stack) == null)
++            return 0;
++        
++        if(from != Orientation.UP && from != Orientation.DOWN)
++            return 0;
++        
++        StackUtil stackUtil = new StackUtil(stack);
++        boolean added = false;
++        
++        int start = getStartInventorySide(from);
++        int end = start + getSizeInventorySide(from);
++
++        for(int i = start; i < end; i++)
++        {
++            if(stackUtil.tryAdding(this, i, doAdd, false))
++            {
++                added = true;
++                break;
++            }
++        }
++
++        if(added)
++        {
++            if(!doAdd)
++                return stackUtil.itemsAdded;
++            else
++            {
++                while(stack.stackSize - stackUtil.itemsAdded > 0)
++                    stackUtil.tryAdding(this, 3, true, false);
++
++                return stackUtil.itemsAdded;
++            }
++        }
++        
++        if(!added)
++        {
++            for(int i = start; i < end; i++)
++            {
++                if(stackUtil.tryAdding(this, i, doAdd, true))
++                {
++                    added = true;
++                    break;
++                }
++            }
++        }
++
++        if(added)
++        {
++            if(!doAdd)
++                return stackUtil.itemsAdded;
++            else
++            {
++                while(stack.stackSize - stackUtil.itemsAdded > 0)
++                    stackUtil.tryAdding(this, 3, true, true);
++
++                return stackUtil.itemsAdded;
++            }
++        }
++        
++        return 0;
++    }
++
++    @Override
++    public ItemStack[] extractItem(boolean doRemove, Orientation from, int maxItemCount)
++    {
++        int start = getStartInventorySide(from);
++        int end = start + getSizeInventorySide(from);
++        
++        for(int i = start; i < end; i++)
++        {
++            if(furnaceItemStacks[i] != null)
++            {
++                if(doRemove)
++                    return new ItemStack[] { decrStackSize(i, 1) };
++                else
++                    return new ItemStack[] { furnaceItemStacks[i] };
++            }
++        }
++        
++        return null;
 +    }
  }
