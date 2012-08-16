@@ -104,7 +104,7 @@
          {
              ItemStack var8 = this.createStackedBlock(par6);
  
-@@ -1249,4 +1257,669 @@
+@@ -1249,4 +1257,714 @@
          canBlockGrass[0] = true;
          StatList.initBreakableStats();
      }
@@ -772,5 +772,50 @@
 +        }
 +
 +        return new ItemStack(id, 1, getDamageValue(world, x, y, z));
++    }
++    
++    /**
++     * Rotate the block counter-clockwise around the X-axis (f=2) the given number of times
++     * 
++     * @param world The current world
++     * @param x X Position
++     * @param y Y Position
++     * @param z Z Position
++     * @param amount Number of times to rotate 90 degrees around axis. May be negative.
++     * @return Whether the rotation succeeded. May fail for blocks such as beds or doors. May also fail rotating half-slabs by 1.
++     */
++    public boolean rotateX(World world, int x, int y, int z, int amount)
++    {
++        return true;
++    }
++    
++    /**
++     * Rotate the block counter-clockwise around the Y-axis (down) the given number of times
++     * 
++     * @param world The current world
++     * @param x X Position
++     * @param y Y Position
++     * @param z Z Position
++     * @param amount Number of times to rotate 90 degrees around axis. May be negative.
++     * @return Whether the rotation succeeded. May fail for blocks such as beds or doors. May also fail rotating half-slabs by 1.
++     */
++    public boolean rotateY(World world, int x, int y, int z, int amount)
++    {
++        return true;
++    }
++    
++    /**
++     * Rotate the block counter-clockwise around the Z-axis (f=3) the given number of times
++     * 
++     * @param world The current world
++     * @param x X Position
++     * @param y Y Position
++     * @param z Z Position
++     * @param amount Number of times to rotate 90 degrees around axis. May be negative.
++     * @return Whether the rotation succeeded. May fail for blocks such as beds or doors. May also fail rotating half-slabs by 1.
++     */
++    public boolean rotateZ(World world, int x, int y, int z, int amount)
++    {
++        return true;
 +    }
  }

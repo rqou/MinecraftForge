@@ -1,0 +1,74 @@
+--- ../src_base/common/net/minecraft/src/BlockRedstoneTorch.java
++++ ../src_work/common/net/minecraft/src/BlockRedstoneTorch.java
+@@ -1,5 +1,6 @@
+ package net.minecraft.src;
+ 
++import static net.minecraftforge.common.ForgeDirection.DOWN;
+ import cpw.mods.fml.common.Side;
+ import cpw.mods.fml.common.asm.SideOnly;
+ import java.util.ArrayList;
+@@ -9,6 +10,8 @@
+ import java.util.Map;
+ import java.util.Random;
+ 
++import net.minecraftforge.common.ForgeDirection;
++
+ public class BlockRedstoneTorch extends BlockTorch
+ {
+     /** Whether the redstone torch is currently active or not. */
+@@ -274,4 +277,55 @@
+             }
+         }
+     }
++    
++    @Override
++    public boolean rotateY(World world, int x, int y, int z, int amount)
++    {
++        int oldMeta = world.getBlockMetadata(x, y, z);
++        if(oldMeta == 5)
++            return true;
++        boolean rotateNeg = amount < 0;
++        amount = Math.abs(amount) % 4;
++        if(rotateNeg)
++            amount = 4 - amount;
++        ForgeDirection dir = ForgeDirection.getOrientation(6 - oldMeta);
++        for(int i = 0; i < amount; i++)
++            dir = dir.getRotCcwY();
++        world.setBlockMetadataWithNotify(x, y, z, 6 - dir.ordinal());
++        return true;
++    }
++    
++    @Override
++    public boolean rotateX(World world, int x, int y, int z, int amount)
++    {
++        int oldMeta = world.getBlockMetadata(x, y, z);
++        boolean rotateNeg = amount < 0;
++        amount = Math.abs(amount) % 4;
++        if(rotateNeg)
++            amount = 4 - amount;
++        ForgeDirection dir = ForgeDirection.getOrientation(6 - oldMeta);
++        for(int i = 0; i < amount; i++)
++            dir = dir.getRotCcwX();
++        if(dir == DOWN)
++            return false;
++        world.setBlockMetadataWithNotify(x, y, z, 6 - dir.ordinal());
++        return true;
++    }
++    
++    @Override
++    public boolean rotateZ(World world, int x, int y, int z, int amount)
++    {
++        int oldMeta = world.getBlockMetadata(x, y, z);
++        boolean rotateNeg = amount < 0;
++        amount = Math.abs(amount) % 4;
++        if(rotateNeg)
++            amount = 4 - amount;
++        ForgeDirection dir = ForgeDirection.getOrientation(6 - oldMeta);
++        for(int i = 0; i < amount; i++)
++            dir = dir.getRotCcwZ();
++        if(dir == DOWN)
++            return false;
++        world.setBlockMetadataWithNotify(x, y, z, 6 - dir.ordinal());
++        return true;
++    }
+ }

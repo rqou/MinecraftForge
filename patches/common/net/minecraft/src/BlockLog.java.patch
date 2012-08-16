@@ -17,7 +17,7 @@
                          }
                      }
                  }
-@@ -148,4 +143,16 @@
+@@ -148,4 +143,52 @@
      {
          return new ItemStack(this.blockID, 1, limitToValidMetadata(par1));
      }
@@ -31,6 +31,42 @@
 +    @Override
 +    public boolean isWood(World world, int x, int y, int z)
 +    {
++        return true;
++    }
++    
++    @Override
++    public boolean rotateX(World world, int x, int y, int z, int amount)
++    {
++        int oldMeta = world.getBlockMetadata(x, y, z);
++        int type = oldMeta & 3;
++        int dir = (oldMeta & 12) >> 2;
++        amount = Math.abs(amount) & 1;
++        if(amount == 1)
++        {
++            if(dir == 0)
++                dir = 1;
++            else if(dir == 1)
++                dir = 0;
++        }
++        world.setBlockMetadataWithNotify(x, y, z, dir << 2 | type);
++        return true;
++    }
++    
++    @Override
++    public boolean rotateZ(World world, int x, int y, int z, int amount)
++    {
++        int oldMeta = world.getBlockMetadata(x, y, z);
++        int type = oldMeta & 3;
++        int dir = (oldMeta & 12) >> 2;
++        amount = Math.abs(amount) & 1;
++        if(amount == 1)
++        {
++            if(dir == 0)
++                dir = 2;
++            else if(dir == 2)
++                dir = 0;
++        }
++        world.setBlockMetadataWithNotify(x, y, z, dir << 2 | type);
 +        return true;
 +    }
  }

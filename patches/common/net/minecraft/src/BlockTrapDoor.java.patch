@@ -55,3 +55,26 @@
          if (par0 <= 0)
          {
              return false;
+@@ -303,4 +315,22 @@
+             return var1 != null && var1.blockMaterial.isOpaque() && var1.renderAsNormalBlock() || var1 == Block.glowStone;
+         }
+     }
++    
++    @Override
++    public boolean rotateY(World world, int x, int y, int z, int amount)
++    {
++        amount = -amount;
++        int oldMeta = world.getBlockMetadata(x, y, z);
++        int pushed = (oldMeta & 4) >> 2;
++        int direction = oldMeta & 3;
++        boolean rotateNeg = amount < 0;
++        amount = Math.abs(amount) % 4;
++        if(rotateNeg)
++            amount = 4 - amount;
++        ForgeDirection dir = ForgeDirection.getOrientation(5 - direction);
++        for(int i = 0; i < amount; i++)
++            dir = dir.getRotCcwY();
++        world.setBlockMetadataWithNotify(x, y, z, (5 - dir.ordinal()) | (pushed << 2));
++        return true;
++    }
+ }

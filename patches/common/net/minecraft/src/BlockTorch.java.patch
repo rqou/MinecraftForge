@@ -121,3 +121,59 @@
              {
                  var7 = true;
              }
+@@ -288,4 +294,55 @@
+             par1World.spawnParticle("flame", var7, var9, var11, 0.0D, 0.0D, 0.0D);
+         }
+     }
++    
++    @Override
++    public boolean rotateY(World world, int x, int y, int z, int amount)
++    {
++        int oldMeta = world.getBlockMetadata(x, y, z);
++        if(oldMeta == 5)
++            return true;
++        boolean rotateNeg = amount < 0;
++        amount = Math.abs(amount) % 4;
++        if(rotateNeg)
++            amount = 4 - amount;
++        ForgeDirection dir = ForgeDirection.getOrientation(6 - oldMeta);
++        for(int i = 0; i < amount; i++)
++            dir = dir.getRotCcwY();
++        world.setBlockMetadataWithNotify(x, y, z, 6 - dir.ordinal());
++        return true;
++    }
++    
++    @Override
++    public boolean rotateX(World world, int x, int y, int z, int amount)
++    {
++        int oldMeta = world.getBlockMetadata(x, y, z);
++        boolean rotateNeg = amount < 0;
++        amount = Math.abs(amount) % 4;
++        if(rotateNeg)
++            amount = 4 - amount;
++        ForgeDirection dir = ForgeDirection.getOrientation(6 - oldMeta);
++        for(int i = 0; i < amount; i++)
++            dir = dir.getRotCcwX();
++        if(dir == DOWN)
++            return false;
++        world.setBlockMetadataWithNotify(x, y, z, 6 - dir.ordinal());
++        return true;
++    }
++    
++    @Override
++    public boolean rotateZ(World world, int x, int y, int z, int amount)
++    {
++        int oldMeta = world.getBlockMetadata(x, y, z);
++        boolean rotateNeg = amount < 0;
++        amount = Math.abs(amount) % 4;
++        if(rotateNeg)
++            amount = 4 - amount;
++        ForgeDirection dir = ForgeDirection.getOrientation(6 - oldMeta);
++        for(int i = 0; i < amount; i++)
++            dir = dir.getRotCcwZ();
++        if(dir == DOWN)
++            return false;
++        world.setBlockMetadataWithNotify(x, y, z, 6 - dir.ordinal());
++        return true;
++    }
+ }

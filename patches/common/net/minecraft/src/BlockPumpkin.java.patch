@@ -1,0 +1,29 @@
+--- ../src_base/common/net/minecraft/src/BlockPumpkin.java
++++ ../src_work/common/net/minecraft/src/BlockPumpkin.java
+@@ -1,4 +1,6 @@
+ package net.minecraft.src;
++
++import net.minecraftforge.common.ForgeDirection;
+ 
+ public class BlockPumpkin extends BlockDirectional
+ {
+@@ -142,4 +144,19 @@
+         int var6 = MathHelper.floor_double((double)(par5EntityLiving.rotationYaw * 4.0F / 360.0F) + 2.5D) & 3;
+         par1World.setBlockMetadataWithNotify(par2, par3, par4, var6);
+     }
++    
++    @Override
++    public boolean rotateY(World world, int x, int y, int z, int amount)
++    {
++        amount = -amount;
++        boolean rotateNeg = amount < 0;
++        amount = Math.abs(amount) % 4;
++        if(rotateNeg)
++            amount = 4 - amount;
++        int oldMeta = world.getBlockMetadata(x, y, z);
++        for(int i = 0; i < amount; i++)
++            oldMeta = (oldMeta + 1) % 4;
++        world.setBlockMetadataWithNotify(x, y, z, oldMeta);
++        return true;
++    }
+ }

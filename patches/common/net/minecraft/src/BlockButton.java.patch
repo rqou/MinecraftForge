@@ -104,3 +104,25 @@
              {
                  var7 = true;
              }
+@@ -369,4 +386,21 @@
+         float var3 = 0.125F;
+         this.setBlockBounds(0.5F - var1, 0.5F - var2, 0.5F - var3, 0.5F + var1, 0.5F + var2, 0.5F + var3);
+     }
++    
++    @Override
++    public boolean rotateY(World world, int x, int y, int z, int amount)
++    {
++        int oldMeta = world.getBlockMetadata(x, y, z);
++        int pushed = (oldMeta & 8) >> 3;
++        int direction = oldMeta & 7;
++        boolean rotateNeg = amount < 0;
++        amount = Math.abs(amount) % 4;
++        if(rotateNeg)
++            amount = 4 - amount;
++        ForgeDirection dir = ForgeDirection.getOrientation(6 - direction);
++        for(int i = 0; i < amount; i++)
++            dir = dir.getRotCcwY();
++        world.setBlockMetadataWithNotify(x, y, z, (6 - dir.ordinal()) | (pushed << 4));
++        return true;
++    }
+ }

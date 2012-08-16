@@ -53,4 +53,25 @@ public enum ForgeDirection
     {
         return getOrientation(opposite[ordinal()]);
     }
+    
+    public static final int[] ccwX = new int[] { 5, 4, 2, 3, 0, 1};
+    
+    public ForgeDirection getRotCcwX()
+    {
+        return getOrientation(ccwX[ordinal()]);
+    }
+    
+    public static final int[] ccwY = new int[] { 0, 1, 4, 5, 3, 2};
+    
+    public ForgeDirection getRotCcwY()
+    {
+        return getOrientation(ccwY[ordinal()]);
+    }
+    
+    public static final int[] ccwZ = new int[] { 3, 2, 0, 1, 4, 5};
+    
+    public ForgeDirection getRotCcwZ()
+    {
+        return getOrientation(ccwZ[ordinal()]);
+    }
 }

@@ -1,0 +1,47 @@
+--- ../src_base/common/net/minecraft/src/BlockFenceGate.java
++++ ../src_work/common/net/minecraft/src/BlockFenceGate.java
+@@ -1,4 +1,6 @@
+ package net.minecraft.src;
++
++import net.minecraftforge.common.ForgeDirection;
+ 
+ public class BlockFenceGate extends BlockDirectional
+ {
+@@ -144,4 +146,37 @@
+     {
+         return (par0 & 4) != 0;
+     }
++    
++    @Override
++    public boolean rotateY(World world, int x, int y, int z, int amount)
++    {
++        int oldMeta = world.getBlockMetadata(x, y, z);
++        int pushed = (oldMeta & 4) >> 2;
++        int direction = oldMeta & 3;
++        boolean rotateNeg = amount < 0;
++        amount = Math.abs(amount) % 4;
++        if(rotateNeg)
++            amount = 4 - amount;
++        for(int i = 0; i < amount; i++)
++        {
++            if(direction == 0)
++            {
++                direction = 3;
++            }
++            else if(direction == 3)
++            {
++                direction = 2;
++            }
++            else if(direction == 2)
++            {
++                direction = 1;
++            }
++            else if(direction == 1)
++            {
++                direction = 0;
++            }
++        }
++        world.setBlockMetadataWithNotify(x, y, z, direction | (pushed << 2));
++        return true;
++    }
+ }

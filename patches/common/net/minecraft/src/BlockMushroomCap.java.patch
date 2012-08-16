@@ -1,0 +1,47 @@
+--- ../src_base/common/net/minecraft/src/BlockMushroomCap.java
++++ ../src_work/common/net/minecraft/src/BlockMushroomCap.java
+@@ -55,4 +55,44 @@
+     {
+         return Block.mushroomBrown.blockID + this.mushroomType;
+     }
++    
++    @Override
++    public boolean rotateY(World world, int x, int y, int z, int amount)
++    {
++        int meta = world.getBlockMetadata(x, y, z);
++        boolean rotateNeg = amount < 0;
++        amount = Math.abs(amount) % 4;
++        if(rotateNeg)
++            amount = 4 - amount;
++        if(meta == 0 || meta == 10 || meta == 5)
++            return true;
++        for(int i = 0; i < amount; i++)
++        {
++            if((meta & 1) == 0)
++            {
++                if(meta == 2)
++                    meta = 4;
++                else if(meta == 4)
++                    meta = 8;
++                else if(meta == 8)
++                    meta = 6;
++                else if(meta == 6)
++                    meta = 2;
++            }
++            else
++            {
++                meta += 2;
++                if(meta == 5)
++                    meta += 2;
++                if(meta == 11)
++                    meta = 1;
++            }
++        }
++        world.setBlockMetadataWithNotify(x, y, z, meta);
++        return true;
++    }
++    
++    public boolean onBlockActivated(World par1World, int par2, int par3, int par4, EntityPlayer par5EntityPlayer, int par6, float par7, float par8, float par9)
++    {/*test*/rotateY(par1World, par2, par3, par4, 1);
++        return true;}
+ }

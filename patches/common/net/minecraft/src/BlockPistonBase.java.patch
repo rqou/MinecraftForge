@@ -1,6 +1,15 @@
 --- ../src_base/common/net/minecraft/src/BlockPistonBase.java
 +++ ../src_work/common/net/minecraft/src/BlockPistonBase.java
-@@ -368,7 +368,7 @@
+@@ -3,6 +3,8 @@
+ import cpw.mods.fml.common.Side;
+ import cpw.mods.fml.common.asm.SideOnly;
+ import java.util.List;
++
++import net.minecraftforge.common.ForgeDirection;
+ 
+ public class BlockPistonBase extends Block
+ {
+@@ -368,7 +370,7 @@
                  return false;
              }
  
@@ -9,3 +18,59 @@
          }
      }
  
+@@ -496,4 +498,55 @@
+             return true;
+         }
+     }
++    
++    @Override
++    public boolean rotateX(World world, int x, int y, int z, int amount)
++    {
++        boolean rotateNeg = amount < 0;
++        amount = Math.abs(amount) % 4;
++        if(rotateNeg)
++            amount = 4 - amount;
++        int oldMeta = world.getBlockMetadata(x, y, z);
++        if(isExtended(oldMeta))
++            return false;
++        ForgeDirection dir = ForgeDirection.getOrientation(oldMeta & 7);
++        for(int i = 0; i < amount; i++)
++            dir = dir.getRotCcwX();
++        world.setBlockMetadataWithNotify(x, y, z, dir.ordinal());
++        return true;
++    }
++    
++    @Override
++    public boolean rotateY(World world, int x, int y, int z, int amount)
++    {
++        boolean rotateNeg = amount < 0;
++        amount = Math.abs(amount) % 4;
++        if(rotateNeg)
++            amount = 4 - amount;
++        int oldMeta = world.getBlockMetadata(x, y, z);
++        if(isExtended(oldMeta))
++            return false;
++        ForgeDirection dir = ForgeDirection.getOrientation(oldMeta & 7);
++        for(int i = 0; i < amount; i++)
++            dir = dir.getRotCcwY();
++        world.setBlockMetadataWithNotify(x, y, z, dir.ordinal());
++        return true;
++    }
++    
++    @Override
++    public boolean rotateZ(World world, int x, int y, int z, int amount)
++    {
++        boolean rotateNeg = amount < 0;
++        amount = Math.abs(amount) % 4;
++        if(rotateNeg)
++            amount = 4 - amount;
++        int oldMeta = world.getBlockMetadata(x, y, z);
++        if(isExtended(oldMeta))
++            return false;
++        ForgeDirection dir = ForgeDirection.getOrientation(oldMeta & 7);
++        for(int i = 0; i < amount; i++)
++            dir = dir.getRotCcwZ();
++        world.setBlockMetadataWithNotify(x, y, z, dir.ordinal());
++        return true;
++    }
+ }
